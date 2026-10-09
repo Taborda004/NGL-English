@@ -80,8 +80,8 @@ Si prefieres realizar la instalación de forma tradicional paso a paso:
 
 ### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/tu-usuario/NGL-English-Assistant.git
-cd NGL-English-Assistant
+git clone https://github.com/Taborda004/NGL-English.git
+cd NGL-English
 ```
 
 ### 2. Crear y activar el entorno virtual
