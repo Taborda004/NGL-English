@@ -1,10 +1,5 @@
 # NGL English Assistant 
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B.svg)](https://streamlit.io/)
-[![Playwright](https://img.shields.io/badge/automation-Playwright-45ba4b.svg)](https://playwright.dev/)
-[![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-8E75C2.svg)](https://aistudio.google.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Un asistente inteligente y autónomo diseñado para analizar, resolver y verificar ejercicios y exámenes de inglés en la plataforma **National Geographic Learning (NGL / Avallain)** (`learn.eltngl.com`).
 
@@ -255,14 +250,5 @@ NGL-English-Assistant/
 
 ---
 
-## Privacidad y Seguridad
 
-* **Sin credenciales almacenadas:** Este software nunca solicita, guarda ni transmite tus datos de usuario o contraseñas. La autenticación ocurre exclusivamente dentro de tu navegador Google Chrome habitual.
-* **Procesamiento Local:** La comunicación entre Playwright y Chrome se produce a través de sockets locales (`localhost:9222`).
-* **Uso Exclusivo para Respuestas:** Únicamente se envían a la API de Gemini los enunciados de los ejercicios activos para formular las respuestas.
 
----
-
-## Licencia y Descargo de Responsabilidad
-
-Este proyecto se distribuye bajo la Licencia MIT. Desarrollado con fines educativos y de investigación sobre automatización web e inteligencia artificial multimodal. El uso de esta herramienta queda bajo la responsabilidad exclusiva del usuario final.
