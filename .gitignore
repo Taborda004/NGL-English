@@ -1,0 +1,46 @@
+# ==============================================================================
+# Git Ignore - NGL English Assistant
+# ==============================================================================
+
+# Virtual Environments
+.venv/
+env/
+venv/
+ENV/
+
+# Python cache & compiled bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Sensitive environment variables (NEVER COMMIT API KEYS OR PASSWORDS)
+.env
+*.env
+!.env.example
+
+# Scratch files, test recordings & debug dumps
+scratch/
+*.png
+*.jpg
+*.jpeg
+*.mp3
+*.wav
+*.html
+*.log
+.tempmediaStorage/
+
+# History records (keep directory structure with .keep)
+history/*.json
+!history/.keep
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor configurations
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
