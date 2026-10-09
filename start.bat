@@ -3,7 +3,7 @@ setlocal
 title NGL English Assistant
 
 echo ==============================================================================
-echo  🎓 NGL English Assistant - Iniciando sistema...
+echo  NGL English Assistant - Iniciando sistema...
 echo ==============================================================================
 
 cd /d "%~dp0"

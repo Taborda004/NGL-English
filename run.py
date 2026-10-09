@@ -53,15 +53,15 @@ def print_step(step_num: int, title: str) -> None:
 
 
 def print_success(msg: str) -> None:
-    print(f"  {GREEN}✔ {msg}{RESET}")
+    print(f"  {GREEN}[OK] {msg}{RESET}")
 
 
 def print_warning(msg: str) -> None:
-    print(f"  {YELLOW}⚠ {msg}{RESET}")
+    print(f"  {YELLOW}[AVISO] {msg}{RESET}")
 
 
 def print_error(msg: str) -> None:
-    print(f"  {RED}✖ {msg}{RESET}")
+    print(f"  {RED}[ERROR] {msg}{RESET}")
 
 
 def verify_python_version() -> None:
@@ -317,7 +317,7 @@ def select_and_configure_browser(preferred: str | None = None) -> None:
 
     # 2. Presentar Menú Interactivo No Invasivo
     print(f"\n{BOLD}{CYAN}------------------------------------------------------------------------------{RESET}")
-    print(f"{BOLD}{CYAN} 🌐 SELECCIÓN DE NAVEGADOR WEB{RESET}")
+    print(f"{BOLD}{CYAN} SELECCION DE NAVEGADOR WEB{RESET}")
     print(f"{BOLD}{CYAN}------------------------------------------------------------------------------{RESET}")
     print("El asistente se comunica con cualquier navegador Chromium en el puerto 9222.")
     print("¿Con qué navegador deseas trabajar?\n")
@@ -332,7 +332,7 @@ def select_and_configure_browser(preferred: str | None = None) -> None:
 
     while True:
         try:
-            choice = input(f"{BOLD}👉 Elige tu opción [1-7] (Enter por defecto = 1): {RESET}").strip()
+            choice = input(f"{BOLD}Selecciona una opcion [1-7] (Enter por defecto = 1): {RESET}").strip()
             if not choice:
                 choice = "1"
 
@@ -380,7 +380,7 @@ def _handle_selected_browser(name: str, paths: list[str], cmd: str) -> None:
     manual_cmd = f'"{path}" --remote-debugging-port={CHROME_DEBUG_PORT} --user-data-dir="{profile_dir}"'
 
     # Preguntar con respeto antes de abrir nada
-    print(f"\n{GREEN}✔ {name} localizado:{RESET} {path}")
+    print(f"\n{GREEN}[OK] {name} localizado:{RESET} {path}")
     ans = input(f"¿Deseas que el asistente abra {name} ahora en modo depuración? [S/n]: ").strip().lower()
 
     if ans in ["n", "no"]:
@@ -416,7 +416,7 @@ def ensure_chrome_running(preferred: str | None = None) -> None:
 def launch_streamlit(venv_python: Path) -> None:
     """Ejecuta la interfaz gráfica Streamlit utilizando el entorno virtual."""
     print(f"\n{BOLD}{GREEN}=============================================================================={RESET}")
-    print(f"{BOLD}{GREEN} 🚀 ¡Todo listo! Iniciando NGL English Assistant...{RESET}")
+    print(f"{BOLD}{GREEN} Iniciando NGL English Assistant...{RESET}")
     print(f"{BOLD}{GREEN}=============================================================================={RESET}\n")
     print(f"  {CYAN}URL de la interfaz:{RESET} http://localhost:8501")
     print(f"  {YELLOW}Para detener el asistente, presiona Ctrl+C en esta terminal.{RESET}\n")
@@ -432,7 +432,7 @@ def launch_streamlit(venv_python: Path) -> None:
     try:
         subprocess.run(cmd)
     except KeyboardInterrupt:
-        print(f"\n{YELLOW}Asistente detenido por el usuario. ¡Hasta pronto!{RESET}")
+        print(f"\n{YELLOW}Asistente detenido por el usuario.{RESET}")
 
 
 def main() -> None:
@@ -447,7 +447,7 @@ def main() -> None:
     preferred_browser = args.browser or os.environ.get("BROWSER") or os.environ.get("PREFERRED_BROWSER")
 
     print(f"{BOLD}{CYAN}=============================================================================={RESET}")
-    print(f"{BOLD}{CYAN} 🎓 NGL English Assistant - One-Click Launcher{RESET}")
+    print(f"{BOLD}{CYAN} NGL English Assistant - Launcher{RESET}")
     print(f"{BOLD}{CYAN}=============================================================================={RESET}")
 
     # 1. Validación de versión

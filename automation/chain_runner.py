@@ -140,7 +140,7 @@ class ChainRunner:
                     next_ok, next_msg = filler.click_next_exercise()
                     if not next_ok:
                         notify("completed", {
-                            "message": f"🎉 Asignación finalizada. Se resolvieron {solved_count} ejercicios exitosamente al 100%."
+                            "message": f"Asignación finalizada. Se resolvieron {solved_count} ejercicios exitosamente al 100%."
                         })
                         return {
                             "status": "completed",
@@ -154,7 +154,7 @@ class ChainRunner:
                 is_exam = any(kw in exercise_title.lower() for kw in ["unit test", "review test", "final test", "midterm test", "assessment"])
                 if is_exam and not self.allow_exams:
                     reason = (
-                        f"⛔ DETECCIÓN DE EXAMEN: '{exercise_title}'. "
+                        f"[ALERTA] DETECCIÓN DE EXAMEN: '{exercise_title}'. "
                         f"El modo autónomo para exámenes está desactivado. Actívalo en las opciones de configuración para resolverlo automáticamente."
                     )
                     notify("error", {"reason": reason, "exercise_title": exercise_title})
@@ -166,7 +166,7 @@ class ChainRunner:
                     }
 
                 if is_exam:
-                    notify("info", {"message": f"🎓 Examen/Unit Test detectado: '{exercise_title}'. Resolviendo en modo 100% autónomo..."})
+                    notify("info", {"message": f"Examen/Unit Test detectado: '{exercise_title}'. Resolviendo en modo autónomo..."})
 
                 # Bucle de pantallas de la actividad (resuelve multi-pantallas y exámenes completos)
                 screen_count = 0
@@ -246,7 +246,7 @@ class ChainRunner:
                                 except Exception:
                                     pass
                         if is_score_screen:
-                            notify("info", {"message": f"🏁 Pantalla de resumen alcanzada en '{exercise_title}'."})
+                            notify("info", {"message": f"Pantalla de resumen alcanzada en '{exercise_title}'."})
                             break
 
                     if not ex_type or ex_type.value == "UNKNOWN":
@@ -325,7 +325,7 @@ class ChainRunner:
                     # Verificar si existe otra pantalla en esta misma actividad/examen
                     has_more_screens = filler.has_next_screen() == True
                     if has_more_screens:
-                        notify("info", {"message": "➡️ Avanzando a la siguiente pantalla del ejercicio/examen..."})
+                        notify("info", {"message": "Avanzando a la siguiente pantalla del ejercicio/examen..."})
                         time.sleep(self.delay_between_exercises)
                         next_scr_ok, next_scr_msg = filler.click_next_screen()
                         if not next_scr_ok:
@@ -337,7 +337,7 @@ class ChainRunner:
 
                 # 6. Submit ("Done" / "Submit to Gradebook")
                 notify("info", {
-                    "message": f"📤 Actividad finalizada ({screen_count} pantalla(s)). Enviando respuesta definitiva ('Done')..."
+                    "message": f"Actividad finalizada ({screen_count} pantalla(s)). Enviando respuesta definitiva ('Done')..."
                 })
                 time.sleep(1.0)
 
@@ -404,7 +404,7 @@ class ChainRunner:
                             if is_perfect:
                                 last_answer_text = retry_answer
                                 last_confidence = float(retry_sol.get("confidence", 1.0))
-                                notify("info", {"message": f"✓ Segundo intento corregido al 100%: {acc_msg}"})
+                                notify("info", {"message": f"[OK] Segundo intento corregido al 100%: {acc_msg}"})
 
                     if not is_perfect and not is_exam:
                         reason = f"RESPUESTA INCORRECTA DETECTADA en '{exercise_title}': {acc_msg}. Automatización detenida de inmediato para conservar los intentos restantes y permitir corregir el código o la respuesta."
@@ -439,7 +439,7 @@ class ChainRunner:
 
                 notify("step_success", {
                     "record": record,
-                    "message": f"✓ Ejercicio {solved_count} completado: {acc_msg}"
+                    "message": f"Ejercicio {solved_count} completado: {acc_msg}"
                 })
 
                 # 8. Advance to next exercise
@@ -448,7 +448,7 @@ class ChainRunner:
 
                 if not next_ok:
                     notify("completed", {
-                        "message": f"🎉 Asignación finalizada. Se resolvieron {solved_count} ejercicios exitosamente al 100%."
+                        "message": f"Asignación finalizada. Se resolvieron {solved_count} ejercicios exitosamente al 100%."
                     })
                     return {
                         "status": "completed",
@@ -464,7 +464,7 @@ class ChainRunner:
 
             if self.max_exercises == 1:
                 notify("completed", {
-                    "message": "✓ Ejercicio resuelto al 100% y avanzado al siguiente con éxito."
+                    "message": "Ejercicio resuelto al 100% y avanzado al siguiente con éxito."
                 })
                 return {
                     "status": "completed",

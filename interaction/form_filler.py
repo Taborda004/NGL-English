@@ -1887,7 +1887,7 @@ class FormFiller:
             }""")
 
             # --- Fallback: Unit Test navigation arrow in the OUTER (main) page frame ---
-            # In Unit Tests on learn.eltngl.com the circular ➡ button used to navigate
+            # In Unit Tests on learn.eltngl.com the circular next button used to navigate
             # between questions ("Screen: X of 25") is rendered by the NGL shell outside
             # the Avallain iframe.  We try every frame that is NOT the Avallain iframe.
             if not clicked:

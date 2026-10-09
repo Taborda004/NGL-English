@@ -13,7 +13,7 @@ if command -v python3 &>/dev/null; then
 elif command -v python &>/dev/null; then
     PYTHON_CMD="python"
 else
-    echo "❌ Error: No se encontró Python 3 instalado en tu sistema."
+    echo "[ERROR] No se encontro Python 3 instalado en tu sistema."
     echo "Instala Python 3.10+ para continuar."
     exit 1
 fi

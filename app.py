@@ -61,8 +61,8 @@ if info:
     st.sidebar.success("● Navegador conectado")
     st.sidebar.markdown(f"**Asignación:**\n{info.get('title', 'NGL')}")
     if not settings.GEMINI_API_KEY:
-        st.sidebar.error("⚠️ GEMINI_API_KEY no configurada en .env")
-        st.warning("⚠️ **Clave de API de Gemini no detectada.** Recuerda configurar tu `GEMINI_API_KEY` en el archivo `.env` para que la IA pueda resolver los ejercicios.")
+        st.sidebar.error("[AVISO] GEMINI_API_KEY no configurada en .env")
+        st.warning("[AVISO] **Clave de API de Gemini no detectada.** Recuerda configurar tu `GEMINI_API_KEY` en el archivo `.env` para que la IA pueda resolver los ejercicios.")
     st.sidebar.markdown("---")
 
     # Initialize session state for execution
@@ -86,10 +86,10 @@ if info:
     selected_mode = st.sidebar.radio(
         "Elige cómo deseas trabajar:",
         [
-            "🛡️ Asistido Seguro (Responder sin Enviar + Revisar)",
-            "🎯 Paso a Paso Autónomo (1 Ejercicio, Envía y Avanza)",
-            "🤖 Modo Autónomo en Cadena",
-            "✍️ Modo Manual (Inspección)"
+            "Asistido Seguro (Responder sin Enviar + Revisar)",
+            "Paso a Paso Autónomo (1 Ejercicio, Envía y Avanza)",
+            "Modo Autónomo en Cadena",
+            "Modo Manual (Inspección)"
         ],
         index=0,
         help=(
@@ -113,9 +113,9 @@ if info:
         status_box = st.container(border=True)
         status_header = status_box.empty()
         if is_single_step:
-            status_header.markdown("### 🔄 Resolviendo ejercicio en pantalla...")
+            status_header.markdown("### Resolviendo ejercicio en pantalla...")
         else:
-            status_header.markdown("### 🔄 Ejecutando cadena autónoma...")
+            status_header.markdown("### Ejecutando cadena autónoma...")
         log_display = status_box.empty()
         log_messages = []
 
@@ -125,21 +125,21 @@ if info:
             
             line = ""
             if event == "info":
-                line = f"ℹ️ {msg}"
+                line = f"[INFO] {msg}"
             elif event == "step_start":
-                line = f"📝 **[{payload.get('exercise_title')}]** - Analizando..."
+                line = f"**[{payload.get('exercise_title')}]** - Analizando..."
             elif event == "analysis_ready":
-                line = f"🔍 Tipo: `{payload.get('type')}`"
+                line = f"Tipo: `{payload.get('type')}`"
             elif event == "solution_ready":
-                line = f"💡 Solución lista ({int(payload.get('confidence', 0)*100)}% conf): `{payload.get('answer')}`"
+                line = f"Solución lista ({int(payload.get('confidence', 0)*100)}% conf): `{payload.get('answer')}`"
             elif event == "filled":
-                line = f"✍️ {msg}"
+                line = f"{msg}"
             elif event == "step_success":
-                line = f"✅ {msg}"
+                line = f"[OK] {msg}"
             elif event == "error":
-                line = f"❌ **ERROR:** {payload.get('reason')}"
+                line = f"[ERROR] {payload.get('reason')}"
             elif event == "completed":
-                line = f"🏁 {msg}"
+                line = f"[COMPLETADO] {msg}"
             
             if line:
                 log_messages.append(line)
@@ -165,38 +165,38 @@ if info:
 
         if result.get("status") == "completed":
             if is_single_step:
-                status_header.markdown("### 🎉 ¡Ejercicio resuelto al 100% y avanzado al siguiente!")
+                status_header.markdown("### Ejercicio resuelto al 100% y avanzado al siguiente.")
             else:
-                status_header.markdown("### 🎉 ¡Asignación finalizada con éxito al 100%!")
+                status_header.markdown("### Asignación finalizada con éxito al 100%.")
         elif result.get("status") == "paused_error":
-            status_header.markdown("### ⛔ Automatización pausada por error o protección de examen.")
+            status_header.markdown("### Automatización pausada por error o protección de examen.")
         elif result.get("status") == "stopped":
-            status_header.markdown("### ⏹ Automatización detenida por el usuario.")
+            status_header.markdown("### Automatización detenida por el usuario.")
 
     def render_execution_feedback():
         if st.session_state.auto_status == "paused_error" and st.session_state.auto_error_reason:
             st.error(
-                f"### ⛔ ALERTA: Automatización Pausada\n\n"
+                f"### ALERTA: Automatización Pausada\n\n"
                 f"**Causa:** {st.session_state.auto_error_reason}\n\n"
                 f"> **Acción requerida:** Revisa la ventana de Chrome. No se enviaron más intentos para evitar errores en tu calificación."
             )
         elif st.session_state.auto_status == "completed":
             if st.session_state.get("last_run_mode") == "single_step":
                 st.success(
-                    "### 🎉 Ejercicio Resuelto al 100% y Avanzado con Éxito\n\n"
+                    "### Ejercicio Resuelto al 100% y Avanzado con Éxito\n\n"
                     "El ejercicio actual fue completado con 100% de precisión y se avanzó a la siguiente actividad en Chrome. "
                     "Revisa la ventana del navegador y presiona nuevamente cuando desees resolver el siguiente."
                 )
             else:
                 st.success(
-                    f"### 🎉 Cadena Finalizada Exitosamente\n\n"
+                    f"### Cadena Finalizada Exitosamente\n\n"
                     f"Se completaron **{len(st.session_state.auto_history)}** ejercicios correctamente sin errores."
                 )
         elif st.session_state.auto_status == "stopped":
             st.warning("La automatización fue detenida por el usuario.")
 
         if st.session_state.auto_history:
-            st.markdown("### 📊 Historial de Ejercicios Resueltos")
+            st.markdown("### Historial de Ejercicios Resueltos")
             st.dataframe(
                 st.session_state.auto_history,
                 column_config={
@@ -221,9 +221,9 @@ if info:
         status_box = st.container(border=True)
         status_header = status_box.empty()
         if is_single_step:
-            status_header.markdown("### 🔄 Respondiendo pregunta actual...")
+            status_header.markdown("### Respondiendo pregunta actual...")
         else:
-            status_header.markdown("### 🔄 Respondiendo preguntas en bucle asistido...")
+            status_header.markdown("### Respondiendo preguntas en bucle asistido...")
             
         log_display = status_box.empty()
         log_messages = []
@@ -246,7 +246,7 @@ if info:
 
             while solved_count < max_steps:
                 if st.session_state.get('safe_stop_requested', False):
-                    log("⏹ Proceso detenido por el usuario.")
+                    log("Proceso detenido por el usuario.")
                     break
 
                 # 1. Title & screen info
@@ -282,7 +282,7 @@ if info:
                         except Exception:
                             pass
 
-                log(f"📝 **Analizando:** {exercise_title}")
+                log(f"**Analizando:** {exercise_title}")
 
                 # 2. Extract & Detect
                 ext = ContentExtractor(page)
@@ -311,17 +311,17 @@ if info:
                             except:
                                 pass
                     if is_score_screen:
-                        log("🏁 **Pantalla final de resumen alcanzada.** ¡Todas las preguntas del examen fueron completadas!")
+                        log("[COMPLETADO] **Pantalla final de resumen alcanzada.** ¡Todas las preguntas del examen fueron completadas!")
                         break
 
-                log(f"🔍 Tipo detectado: `{ex_type.value}`. Consultando IA...")
+                log(f"Tipo detectado: `{ex_type.value}`. Consultando IA...")
 
                 # 3. Solve with AI
                 solver = AISolver()
                 sol = solver.solve(ex_type.value, txt, img, aud)
 
                 if "error" in sol:
-                    log(f"❌ Error en la IA: {sol['error']}")
+                    log(f"[ERROR] Error en la IA: {sol['error']}")
                     break
 
                 answer = sol.get("answer", "")
@@ -329,16 +329,16 @@ if info:
                 expl = sol.get("explanation", "")
 
                 if ex_type == ExerciseType.SPEAKING:
-                    log(f"🗣️ **Respuesta sugerida para pronunciar ({int(conf*100)}% conf):** `{answer}`")
+                    log(f"**Respuesta sugerida para pronunciar ({int(conf*100)}% conf):** `{answer}`")
                 else:
-                    log(f"💡 Respuesta generada ({int(conf*100)}% conf): `{answer}`")
+                    log(f"Respuesta generada ({int(conf*100)}% conf): `{answer}`")
 
                 # 4. Fill answer in Chrome
                 fill_ok, fill_msg = filler.fill_answer(answer, ex_type.value)
                 if not fill_ok:
-                    log(f"⚠️ Nota de llenado: {fill_msg}")
+                    log(f"[AVISO] Nota de llenado: {fill_msg}")
                 else:
-                    log(f"✍️ {fill_msg}")
+                    log(f"{fill_msg}")
 
                 time.sleep(0.8)
 
@@ -361,22 +361,22 @@ if info:
                 
                 if is_single_step:
                     if next_ok:
-                        log("➡️ Se avanzó a la siguiente pregunta/pantalla exitosamente.")
+                        log("Se avanzó a la siguiente pregunta/pantalla exitosamente.")
                     else:
-                        log(f"ℹ️ {next_msg}")
+                        log(f"[INFO] {next_msg}")
                     break
                 else:
                     if not next_ok:
-                        log(f"🏁 {next_msg}")
-                        log("🎉 ¡Llegaste a la última pantalla del examen/actividad!")
+                        log(f"[COMPLETADO] {next_msg}")
+                        log("¡Llegaste a la última pantalla del examen/actividad!")
                         break
                     else:
-                        log("➡️ Avanzando a la siguiente pregunta en Chrome...")
+                        log("Avanzando a la siguiente pregunta en Chrome...")
 
             if is_single_step:
-                status_header.markdown("### ✅ Pregunta respondida y avanzada")
+                status_header.markdown("### Pregunta respondida y avanzada")
             else:
-                status_header.markdown("### 📋 Proceso asistido completado")
+                status_header.markdown("### Proceso asistido completado")
 
         finally:
             manager.close()
@@ -385,15 +385,15 @@ if info:
 
     # MODO 1: ASISTIDO SEGURO (RESPONDER SIN ENVIAR + REVISAR)
     # ==========================================
-    if selected_mode == "🛡️ Asistido Seguro (Responder sin Enviar + Revisar)":
-        st.subheader("🛡️ Asistido Seguro: Responder sin Enviar + Revisión Final")
+    if selected_mode == "Asistido Seguro (Responder sin Enviar + Revisar)":
+        st.subheader("Asistido Seguro: Responder sin Enviar + Revisión Final")
         st.info(
-            "💡 **Modo Asistido Seguro Activo:** Este modo resuelve y rellena automáticamente cada pregunta o pantalla en Chrome, "
+            "**Modo Asistido Seguro Activo:** Este modo resuelve y rellena automáticamente cada pregunta o pantalla en Chrome, "
             "y avanza a la siguiente **SIN ENVIAR NADA**. No quema ningún intento. Todas las respuestas se registran abajo "
             "para que al finalizar puedas verificar todo al 100% antes de confirmar el envío definitivo."
         )
 
-        with st.expander("⚙️ Opciones de Configuración Asistida", expanded=False):
+        with st.expander("Opciones de Configuración Asistida", expanded=False):
             col_cfg1, col_cfg2 = st.columns(2)
             with col_cfg1:
                 safe_conf = st.slider("Confianza mínima de IA (%)", min_value=50, max_value=99, value=80, step=5, key="safe_conf")
@@ -401,9 +401,9 @@ if info:
                 safe_delay = st.slider("Pausa antes de avanzar (seg)", min_value=1.0, max_value=5.0, value=1.5, step=0.5, key="safe_delay")
 
         col_safe1, col_safe2, col_safe_stop = st.columns([2, 2, 1])
-        single_safe_clicked = col_safe1.button("▶ Responder Esta Pregunta y Avanzar", type="primary", help="Responde la pregunta actual en Chrome y avanza a la siguiente pantalla sin enviar nada.")
+        single_safe_clicked = col_safe1.button("Responder Esta Pregunta y Avanzar", type="primary", help="Responde la pregunta actual en Chrome y avanza a la siguiente pantalla sin enviar nada.")
         all_safe_clicked = col_safe2.button("⏩ Responder Todo hasta el Final", help="Responde y avanza automáticamente todas las preguntas hasta la pantalla final sin enviar nada.")
-        stop_safe_clicked = col_safe_stop.button("⏹ Detener")
+        stop_safe_clicked = col_safe_stop.button("Detener")
 
         if stop_safe_clicked:
             st.session_state.safe_stop_requested = True
@@ -416,7 +416,7 @@ if info:
 
         # Panel de Revisión
         st.markdown("---")
-        st.subheader("📋 Panel de Revisión de Respuestas")
+        st.subheader("Panel de Revisión de Respuestas")
         st.write("Verifica aquí todas las preguntas y respuestas colocadas por el asistente antes de enviar:")
 
         if st.session_state.safe_history:
@@ -439,50 +439,50 @@ if info:
 
             col_nav1, col_nav2, col_clear = st.columns([1, 1, 1])
             with col_nav1:
-                if st.button("⬅️ Ver Pantalla Anterior en Chrome"):
+                if st.button("Ver Pantalla Anterior en Chrome"):
                     def prev_fn(page):
                         return FormFiller(page).click_previous_screen()
                     ok, msg = run_with_browser(prev_fn)
                     if ok: st.info(msg)
             with col_nav2:
-                if st.button("➡️ Ver Pantalla Siguiente en Chrome"):
+                if st.button("Ver Pantalla Siguiente en Chrome"):
                     def next_fn(page):
                         return FormFiller(page).click_next_screen()
                     ok, msg = run_with_browser(next_fn)
                     if ok: st.info(msg)
             with col_clear:
-                if st.button("🗑️ Limpiar Historial de Revisión"):
+                if st.button("Limpiar Historial de Revisión"):
                     st.session_state.safe_history = []
                     st.rerun()
 
             # Envío Definitivo Protegido
             with st.container(border=True):
-                st.markdown("### 📤 Envío Definitivo de Calificación")
+                st.markdown("### Envío Definitivo de Calificación")
                 st.write("Solo cuando hayas verificado todas las respuestas y estés 100% satisfecho, envía la calificación:")
-                confirm_done = st.checkbox("☑️ He revisado todas las respuestas y confirmo que deseo enviar la calificación a la plataforma.")
-                if st.button("🚀 Enviar Todo Definitivamente (Done / Submit to Gradebook)", type="primary", disabled=not confirm_done):
+                confirm_done = st.checkbox("He revisado todas las respuestas y confirmo que deseo enviar la calificación a la plataforma.")
+                if st.button("Enviar Todo Definitivamente (Done / Submit to Gradebook)", type="primary", disabled=not confirm_done):
                     def submit_final_fn(page):
                         return FormFiller(page).submit_done()
                     ok, msg = run_with_browser(submit_final_fn)
                     if ok:
-                        st.success("🎉 ¡Asignación / Examen enviado exitosamente a la plataforma!")
+                        st.success("¡Asignación / Examen enviado exitosamente a la plataforma!")
                     else:
                         st.error(f"No se pudo enviar: {msg}")
         else:
-            st.info("Aún no has respondido preguntas en esta sesión. Presiona **'▶ Responder Esta Pregunta y Avanzar'** para comenzar.")
+            st.info("Aún no has respondido preguntas en esta sesión. Presiona **'Responder Esta Pregunta y Avanzar'** para comenzar.")
 
     # ==========================================
     # MODO 2: PASO A PASO AUTÓNOMO (1 EJERCICIO, ENVÍA Y AVANZA)
     # ==========================================
-    elif selected_mode == "🎯 Paso a Paso Autónomo (1 Ejercicio, Envía y Avanza)":
-        st.subheader("🎯 Paso a Paso Autónomo: 1 Ejercicio y Avanzar")
+    elif selected_mode == "Paso a Paso Autónomo (1 Ejercicio, Envía y Avanza)":
+        st.subheader("Paso a Paso Autónomo: 1 Ejercicio y Avanzar")
         st.write(
             "Este modo resuelve con IA **únicamente el ejercicio actual en pantalla**, envía la respuesta ('Done'), "
             "verifica que obtenga el 100%, **avanza al siguiente ejercicio** en Chrome y se detiene automáticamente. "
             "Ideal para lecciones regulares donde deseas enviar y calificar cada ejercicio de inmediato."
         )
 
-        with st.expander("⚙️ Opciones de Configuración", expanded=False):
+        with st.expander("Opciones de Configuración", expanded=False):
             col_cfg1, col_cfg2 = st.columns(2)
             with col_cfg1:
                 min_conf = st.slider("Confianza mínima de IA (%)", min_value=50, max_value=99, value=80, step=5, key="step_conf")
@@ -490,7 +490,7 @@ if info:
                 delay_sec = st.slider("Pausa antes de avanzar (seg)", min_value=1.0, max_value=5.0, value=2.0, step=0.5, key="step_delay")
 
             allow_exams_step = st.checkbox(
-                "🔓 Permitir resolver exámenes y Unit Tests automáticamente",
+                "Permitir resolver exámenes y Unit Tests automáticamente",
                 value=True,
                 key="step_allow_exams",
                 help="Permite resolver exámenes y Unit Tests multi-pantalla de forma autónoma hasta enviarlos."
@@ -504,8 +504,8 @@ if info:
             )
 
         col_run, col_stop = st.columns([2, 1])
-        step_clicked = col_run.button("▶ Resolver Ejercicio Actual y Avanzar", type="primary")
-        stop_clicked = col_stop.button("⏹ Detener")
+        step_clicked = col_run.button("Resolver Ejercicio Actual y Avanzar", type="primary")
+        stop_clicked = col_stop.button("Detener")
 
         if stop_clicked:
             st.session_state.auto_stop_requested = True
@@ -527,14 +527,14 @@ if info:
     # ==========================================
     # MODO 2: MODO 100% AUTÓNOMO EN CADENA
     # ==========================================
-    elif selected_mode == "🤖 Modo Autónomo en Cadena":
-        st.subheader("🤖 Modo 100% Autónomo en Cadena")
+    elif selected_mode == "Modo Autónomo en Cadena":
+        st.subheader("Modo Autónomo en Cadena")
         st.write(
             "El sistema resolverá, completará y enviará cada ejercicio secuencialmente en cadena continua. "
             "**Se detendrá de inmediato** si ocurre un error, si la confianza de la IA es baja, o si la respuesta enviada no obtiene el 100%."
         )
 
-        with st.expander("⚙️ Opciones de Configuración Autónoma", expanded=False):
+        with st.expander("Opciones de Configuración Autónoma", expanded=False):
             col_cfg1, col_cfg2, col_cfg3 = st.columns(3)
             with col_cfg1:
                 min_conf = st.slider("Confianza mínima de IA (%)", min_value=50, max_value=99, value=80, step=5, key="chain_conf")
@@ -544,7 +544,7 @@ if info:
                 max_ex = st.number_input("Máximo de ejercicios en cadena", min_value=1, max_value=100, value=30, step=1, key="chain_max")
 
             allow_exams_chain = st.checkbox(
-                "🔓 Resolver exámenes y Unit Tests automáticamente (Full Autónomo)",
+                "Resolver exámenes y Unit Tests automáticamente (Full Autónomo)",
                 value=True,
                 key="chain_allow_exams",
                 help="Permite resolver exámenes y Unit Tests acumulativos con todas sus preguntas y pronunciación de forma continua y autónoma."
@@ -558,9 +558,9 @@ if info:
             )
 
         col_step, col_chain, col_stop = st.columns([2, 2, 1])
-        step_clicked = col_step.button("▶ Resolver Solo 1 y Avanzar", help="Resuelve únicamente el ejercicio en pantalla y se detiene.")
+        step_clicked = col_step.button("Resolver Solo 1 y Avanzar", help="Resuelve únicamente el ejercicio en pantalla y se detiene.")
         start_clicked = col_chain.button("⏩ Iniciar Cadena Continua", type="primary")
-        stop_clicked = col_stop.button("⏹ Detener")
+        stop_clicked = col_stop.button("Detener")
 
         if stop_clicked:
             st.session_state.auto_stop_requested = True
@@ -591,16 +591,16 @@ if info:
     # ==========================================
     # MODO 4: MODO MANUAL (INSPECCIÓN)
     # ==========================================
-    elif selected_mode == "✍️ Modo Manual (Inspección)":
-        st.subheader("✍️ Modo Manual (Inspección)")
+    elif selected_mode == "Modo Manual (Inspección)":
+        st.subheader("Modo Manual (Inspección)")
         st.info(
-            "💡 **Modo Manual Activo:** Haz clic en 'Analizar' para que la IA proponga la solución. Puedes editarla antes de completarla. "
+            "**Modo Manual Activo:** Haz clic en 'Analizar' para que la IA proponga la solución. Puedes editarla antes de completarla. "
             "En exámenes o actividades, puedes completar cada pantalla e inspeccionar todo antes de enviar."
         )
 
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🔍 Analizar", type="primary"):
+            if st.button("Analizar", type="primary"):
                 with st.spinner("Analizando ejercicio en pantalla..."):
                     def analyze_logic(page):
                         extractor = ContentExtractor(page)
@@ -646,7 +646,7 @@ if info:
                 
                 col_a, col_b, col_c = st.columns(3)
                 with col_a:
-                    if st.button("✓ Aceptar respuesta (Completar)"):
+                    if st.button("Aceptar respuesta (Completar)"):
                         def fill_logic(page):
                             filler = FormFiller(page)
                             return filler.fill_answer(edited_answer, st.session_state.current_analysis['type'])
@@ -659,11 +659,11 @@ if info:
                             else:
                                 st.error(f"Fallo al ingresar respuesta: {msg}")
                 with col_b:
-                    if st.button("✗ Rechazar"):
+                    if st.button("Rechazar"):
                         st.session_state.pop('current_solution', None)
                         st.rerun()
                 with col_c:
-                    if st.button("➡️ Siguiente Pantalla / Ejercicio"):
+                    if st.button("Siguiente Pantalla / Ejercicio"):
                         def next_logic(page):
                             filler = FormFiller(page)
                             return filler.click_next_screen()
@@ -680,10 +680,10 @@ if info:
                             else:
                                 st.error(msg)
 
-        # Diagnóstico de navegación (expandible, para cuando el botón ➡ no funciona)
-        with st.expander("🔧 Diagnóstico: Inspeccionar botón de navegación del test"):
-            st.write("Haz clic en el botón de abajo para ver todos los botones visibles en la página del Unit Test. Útil para depurar cuando el botón ➡ no se detecta automáticamente.")
-            if st.button("🔍 Inspeccionar botones de navegación en Chrome"):
+        # Diagnóstico de navegación (expandible, para cuando el botón  no funciona)
+        with st.expander("Diagnóstico: Inspeccionar botón de navegación del test"):
+            st.write("Haz clic en el botón de abajo para ver todos los botones visibles en la página del Unit Test. Útil para depurar cuando el botón  no se detecta automáticamente.")
+            if st.button("Inspeccionar botones de navegación en Chrome"):
                 def inspect_nav_buttons(page):
                     results = []
                     for i, frame in enumerate([page] + page.frames):
@@ -725,23 +725,23 @@ if info:
                         st.markdown("---")
 
 else:
-    st.info("👋 **¡Bienvenido a NGL English Assistant!** Esperando conexión con tu navegador Chromium (Brave, Opera, Edge, Chrome)...")
+    st.info("**¡Bienvenido a NGL English Assistant!** Esperando conexión con tu navegador Chromium (Brave, Opera, Edge, Chrome)...")
     
     with st.container(border=True):
-        st.subheader("📋 Pasos rápidos para comenzar:")
+        st.subheader("Pasos rápidos para comenzar:")
         
         # Estado de la API Key
         if settings.GEMINI_API_KEY:
-            st.success("✅ **Clave de Gemini configurada:** `.env` cargado correctamente.")
+            st.success("[OK] **Clave de Gemini configurada:** `.env` cargado correctamente.")
         else:
-            st.warning("⚠️ **Clave de Gemini no detectada:** Copia `.env.example` como `.env` e introduce tu `GEMINI_API_KEY` gratuita de [Google AI Studio](https://aistudio.google.com/).")
+            st.warning("[AVISO] **Clave de Gemini no detectada:** Copia `.env.example` como `.env` e introduce tu `GEMINI_API_KEY` gratuita de [Google AI Studio](https://aistudio.google.com/).")
         
         st.markdown("---")
-        st.markdown("### 1️⃣ Iniciar tu navegador en modo depuración remota")
+        st.markdown("### 1. Iniciar tu navegador en modo depuración remota")
         st.write("El asistente es compatible con **Brave, Opera, Opera GX, Microsoft Edge y Google Chrome**. Cierra tu navegador y ábrelo con el comando correspondiente:")
         
         tab_brave, tab_opera, tab_edge, tab_chrome, tab_other = st.tabs([
-            "🦁 Brave", "🔴 Opera / Opera GX", "🌐 Microsoft Edge", "🟡 Google Chrome", "🍎 Mac / 🐧 Linux"
+            "Brave", "Opera / Opera GX", "Microsoft Edge", "Google Chrome", "macOS / Linux"
         ])
         with tab_brave:
             st.markdown("**Comando para Brave Browser (Windows):**")
@@ -764,9 +764,9 @@ else:
             st.markdown("**Linux:**")
             st.code('brave-browser --remote-debugging-port=9222 --user-data-dir="/tmp/brave-dev-profile"', language="bash")
             
-        st.markdown("### 2️⃣ Iniciar sesión en National Geographic Learning")
+        st.markdown("### 2. Iniciar sesión en National Geographic Learning")
         st.write("En la ventana del navegador que se abrió, ingresa a [learn.eltngl.com](https://learn.eltngl.com) y entra al ejercicio que deseas resolver.")
         
-        st.markdown("### 3️⃣ Conectar el Asistente")
-        if st.button("🔄 Reintentar Conexión con el Navegador", type="primary"):
+        st.markdown("### 3. Conectar el Asistente")
+        if st.button("Reintentar Conexión con el Navegador", type="primary"):
             st.rerun()
