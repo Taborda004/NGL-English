@@ -34,6 +34,7 @@ class ExerciseDetector:
                 try:
                     res = frame.evaluate(r"""() => {
                         const $ = window.jQuery;
+                        if ($) {
                             let activeWrap = $('.content-wrap:visible, .activity:visible').first();
                             if (activeWrap.length === 0) {
                                 activeWrap = $('.content-wrap, .activity').filter(function() { return $(this).css('display') !== 'none'; }).first();
@@ -48,8 +49,8 @@ class ExerciseDetector:
                                 reordering: has('.shuffle_interaction, .os-sequence__shuffle, .os-sequence-element, .ui-sortable'),
                                 matching: has('.is-linking-lines, .ll_element_view, .isLinkingMultipleLines__handle, .matching_interaction, [class*="linking-lines"]'),
                                 highlighting: has('.im-marking, .imMarking, .im-marking__item-button, button.imMarking__button'),
-                                proofing: has('.im-proofing, .im-proofing__editor, .markable, .btn-add'),
-                                dragdrop: has('.om-text-gap__droppable, .drag_holder'),
+                                proofing: has('.im-proofing, .im-proofing__editor, .imProofing'),
+                                dragdrop: has('.om-text-gap__droppable, .om-text-gap__target-item, .drag_holder, .om-text-gap__drag-item'),
                                 dropdown: has('.is-dropdown, .listbox, .rich-dropdown, .wrapper-dropdown'),
                                 multichoice: has('input[type="radio"], .radio-group, .choice_interaction, .is-radiobutton-choice'),
                                 fillblank: has('input.textGapItem__input, .textgap input, input[type="text"], textarea'),
@@ -76,8 +77,8 @@ class ExerciseDetector:
                             reordering: hasVis('.shuffle_interaction, .os-sequence__shuffle, .os-sequence-element, .ui-sortable'),
                             matching: hasVis('.is-linking-lines, .ll_element_view, .isLinkingMultipleLines__handle, .matching_interaction'),
                             highlighting: hasVis('.im-marking, .imMarking, .im-marking__item-button'),
-                            proofing: hasVis('.im-proofing, .im-proofing__editor, .markable'),
-                            dragdrop: hasVis('.om-text-gap__droppable, .drag_holder'),
+                            proofing: hasVis('.im-proofing, .im-proofing__editor, .imProofing'),
+                            dragdrop: hasVis('.om-text-gap__droppable, .om-text-gap__target-item, .drag_holder, .om-text-gap__drag-item'),
                             dropdown: hasVis('.is-dropdown, .listbox, .wrapper-dropdown'),
                             multichoice: hasVis('input[type="radio"], .radio-group, .choice_interaction'),
                             fillblank: hasVis('input.textGapItem__input, .textgap input, input[type="text"], textarea'),
@@ -88,12 +89,12 @@ class ExerciseDetector:
                     
                     if res:
                         if res.get('speaking'): found_types.add(ExerciseType.SPEAKING)
+                        if res.get('dragdrop'): found_types.add(ExerciseType.DRAG_AND_DROP)
                         if res.get('sorting'): found_types.add(ExerciseType.SORTING)
                         if res.get('reordering'): found_types.add(ExerciseType.REORDERING)
                         if res.get('matching'): found_types.add(ExerciseType.MATCHING)
                         if res.get('highlighting'): found_types.add(ExerciseType.HIGHLIGHTING)
                         if res.get('proofing'): found_types.add(ExerciseType.PROOFREADING)
-                        if res.get('dragdrop'): found_types.add(ExerciseType.DRAG_AND_DROP)
                         if res.get('dropdown'): found_types.add(ExerciseType.DROPDOWN)
                         if res.get('multichoice'): found_types.add(ExerciseType.MULTIPLE_CHOICE)
                         if res.get('fillblank'): found_types.add(ExerciseType.FILL_BLANK)
@@ -106,6 +107,8 @@ class ExerciseDetector:
                             content = frame.content()
                             if 'is-radiobutton-voice' in content or 'contentblock--SpeakingAndRecording' in content:
                                 found_types.add(ExerciseType.SPEAKING)
+                            if 'om-text-gap__droppable' in content or 'om-text-gap__target-item' in content:
+                                found_types.add(ExerciseType.DRAG_AND_DROP)
                             if 'osSorting' in content or 'os-sorting-element' in content:
                                 found_types.add(ExerciseType.SORTING)
                             if 'shuffle_interaction' in content or 'os-sequence-element' in content:
@@ -114,10 +117,8 @@ class ExerciseDetector:
                                 found_types.add(ExerciseType.MATCHING)
                             if 'im-marking__item-button' in content or 'im-marking' in content:
                                 found_types.add(ExerciseType.HIGHLIGHTING)
-                            if 'im-proofing' in content or 'markable' in content:
+                            if 'im-proofing' in content or 'imProofing' in content:
                                 found_types.add(ExerciseType.PROOFREADING)
-                            if 'om-text-gap__droppable' in content:
-                                found_types.add(ExerciseType.DRAG_AND_DROP)
                             if 'listbox' in content or 'wrapper-dropdown' in content or 'is-dropdown' in content:
                                 found_types.add(ExerciseType.DROPDOWN)
                             if 'type="radio"' in content or 'choice_interaction' in content:
@@ -131,12 +132,12 @@ class ExerciseDetector:
             
             # Prioritize types
             if ExerciseType.SPEAKING in found_types: return ExerciseType.SPEAKING
+            if ExerciseType.DRAG_AND_DROP in found_types: return ExerciseType.DRAG_AND_DROP
             if ExerciseType.SORTING in found_types: return ExerciseType.SORTING
             if ExerciseType.REORDERING in found_types: return ExerciseType.REORDERING
             if ExerciseType.MATCHING in found_types: return ExerciseType.MATCHING
             if ExerciseType.HIGHLIGHTING in found_types: return ExerciseType.HIGHLIGHTING
             if ExerciseType.PROOFREADING in found_types: return ExerciseType.PROOFREADING
-            if ExerciseType.DRAG_AND_DROP in found_types: return ExerciseType.DRAG_AND_DROP
             if ExerciseType.DROPDOWN in found_types: return ExerciseType.DROPDOWN
             if ExerciseType.MULTIPLE_CHOICE in found_types: return ExerciseType.MULTIPLE_CHOICE
             if ExerciseType.FILL_BLANK in found_types: return ExerciseType.FILL_BLANK

@@ -25,6 +25,7 @@ class ContentExtractor:
                             activeWrap = $('.content-wrap, .activity').filter(function() { return $(this).css('display') !== 'none'; }).first();
                         }
                         
+                        const wraps = $('.content-wrap');
                         if (activeWrap.length > 0 || wraps.length > 0) {
                             const title = $('.learningObject__title, .lo-title, h1, h2').first().text().trim();
                             const target = activeWrap.length > 0 ? activeWrap : $('.activity:visible').first();
