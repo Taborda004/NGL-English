@@ -688,7 +688,7 @@ class FormFiller:
                         const parent = dv && dv.model ? dv.model.parent : null;
                         if (!parent || !parent.targetDropAreas || !parent.dragElements) return { handled: false };
                         
-                        const norm = s => (s || '').replace(/[\s\u00a0]+/g, ' ').trim().toLowerCase();
+                        const norm = s => (s || '').replace(/[\s\u00a0]+/g, ' ').replace(/[’‘`]/g, "'").trim().toLowerCase();
                         let count = 0;
                         
                         answers.forEach(([targetIdx, word]) => {
