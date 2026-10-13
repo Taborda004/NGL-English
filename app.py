@@ -254,6 +254,7 @@ if info:
                 for f in page.frames:
                     if "cdn_proxy" in f.url or "avallain" in f.url:
                         try:
+                            info = f.evaluate(r"""() => {
                                 let active = $('.content-wrap:visible, .activity:visible').first();
                                 if (active.length === 0) {
                                     active = $('.content-wrap, .activity').filter(function() { return $(this).css('display') !== 'none'; }).first();
@@ -300,6 +301,7 @@ if info:
                     for f in page.frames:
                         if "cdn_proxy" in f.url or "avallain" in f.url:
                             try:
+                                is_score_screen = f.evaluate(r"""() => {
                                     let active = $('.content-wrap:visible, .activity:visible').first();
                                     if (active.length === 0) {
                                         active = $('.content-wrap, .activity').filter(function() { return $(this).css('display') !== 'none'; }).first();
