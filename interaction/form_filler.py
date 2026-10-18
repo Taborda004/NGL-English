@@ -198,7 +198,7 @@ class FormFiller:
                 try:
                     from interaction.speech_player import SpeechPlayer
                     sp = SpeechPlayer()
-                    text_to_speak = selected_text or answer_text
+                    text_to_speak = (selected_text or answer_text or "").strip()
 
                     # Pulsar botón Record en la pantalla visible
                     record_clicked = False
@@ -219,10 +219,11 @@ class FormFiller:
                         except Exception:
                             pass
 
-                    time.sleep(0.6)
+                    time.sleep(1.0)
                     # Reproducir frase en inglés por el cable virtual al micrófono de Chrome
-                    sp.play_sentence(text_to_speak)
-                    time.sleep(0.6)
+                    if text_to_speak:
+                        sp.play_sentence(text_to_speak)
+                    time.sleep(1.2)
 
                     # Pulsar botón Stop / Finalizar grabación
                     for frame in frames:
@@ -276,7 +277,7 @@ class FormFiller:
                                             const isMatch = (targetId && itemId == targetId) || (targetText && (itemText.includes(targetText) || targetText.includes(itemText)));
                                             if (isMatch) {
                                                 $item.addClass('isRadiobuttonVoice__item--selected').attr('aria-selected', 'true');
-                                                $item.find('input[type="radio"]').prop('checked', true);
+                                                $item.find('input[type="radio"]').prop('checked', true).trigger('change');
                                             } else {
                                                 $item.removeClass('isRadiobuttonVoice__item--selected').attr('aria-selected', 'false');
                                                 $item.find('input[type="radio"]').prop('checked', false);
