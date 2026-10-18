@@ -35,6 +35,9 @@ CRITICAL ACCURACY GUIDELINES:
     - Distinguishing 'Would you mind' vs 'Do you mind': ALWAYS check the verb tense in the following 'if' clause:
       * If followed by a PAST tense verb (e.g. 'if I took...', 'if we talked...', 'if I borrowed...'), you MUST use 'Would you mind' (or 'Would it be').
       * If followed by a PRESENT tense verb (e.g. 'if I stand...', 'if I make...', 'if I leave...'), you MUST use 'Do you mind'.
+    - Grammatical Inflection and Subject-Verb Agreement:
+      * When a blank is preceded by the infinitive particle 'to' (e.g. 'uses it to [   ]', 'likes to [   ]'), you MUST select a base/infinitive verb (e.g. 'stay in touch'), NEVER an inflected verb with '-s' (e.g. 'loves communicating') or past tense.
+      * When a singular subject (e.g. 'Mrs. Harris', 'he', 'she') directly precedes the blank as the main subject of the clause, the verb MUST agree in number (e.g. 'loves communicating'), NEVER an uninflected base verb (e.g. 'stay in touch').
   * Verify that each selected answer belongs verbatim to the word pool.
   * Provide all answers in numerical order separated by ' | ' (e.g. '1. spent time | 2. get in touch | 3. call someone | ...').
 - For 'FILL_BLANK' (Fill in the blanks / word transformations):
