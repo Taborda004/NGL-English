@@ -10,20 +10,8 @@ class BrowserManager:
         
     def connect(self):
         try:
-            # Pre-activar la pestaña de NGL vía endpoint HTTP de Chrome para desenfocar la omnibox y evitar bloqueos en Chrome 152+
-            try:
-                import urllib.request, json
-                with urllib.request.urlopen(f"http://127.0.0.1:{self.port}/json", timeout=1.5) as r:
-                    tabs = json.loads(r.read())
-                ngl_tab = next((t for t in tabs if 'eltngl' in t.get('url', '')), None)
-                if ngl_tab:
-                    req = urllib.request.Request(f"http://127.0.0.1:{self.port}/json/activate/{ngl_tab['id']}")
-                    urllib.request.urlopen(req, timeout=1.5)
-            except Exception:
-                pass
-
             self.playwright = sync_playwright().start()
-            self.browser = self.playwright.chromium.connect_over_cdp(f"http://localhost:{self.port}", timeout=10000)
+            self.browser = self.playwright.chromium.connect_over_cdp(f"http://127.0.0.1:{self.port}", timeout=10000)
             self.context = self.browser.contexts[0]
             logging.info("Connected to Chrome instance successfully.")
             return True

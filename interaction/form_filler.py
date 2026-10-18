@@ -10,13 +10,6 @@ class FormFiller:
             return False, "No page connected."
             
         try:
-            # Traer la pestaña de NGL al frente para que Chrome no ignore los eventos de ratón
-            try:
-                self.page.bring_to_front()
-                time.sleep(0.3)
-            except:
-                pass
-                
             frames = [self.page.main_frame] + self.page.frames
             
             # --- PRESENTATION / STUDY / PRONUNCIATION ---
