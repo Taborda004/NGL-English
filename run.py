@@ -447,6 +447,15 @@ def launch_streamlit(venv_python: Path) -> None:
     print(f"  {CYAN}URL de la interfaz:{RESET} http://localhost:8501")
     print(f"  {YELLOW}Para detener el asistente, presiona Ctrl+C en esta terminal.{RESET}\n")
 
+    # Evitar que Streamlit pregunte por correo en la primera ejecucion en equipos nuevos
+    try:
+        cred_file = Path.home() / ".streamlit" / "credentials.toml"
+        if not cred_file.exists():
+            cred_file.parent.mkdir(parents=True, exist_ok=True)
+            cred_file.write_text('[general]\nemail = ""\n', encoding="utf-8")
+    except Exception:
+        pass
+
     cmd = [
         str(venv_python),
         "-m", "streamlit", "run",
