@@ -55,7 +55,7 @@ class ExerciseDetector:
                                 multichoice: has('input[type="radio"], .radio-group, .choice_interaction, .is-radiobutton-choice'),
                                 fillblank: has('input.textGapItem__input, .textgap input, input[type="text"], textarea'),
                                 listening: has('audio, .audio-player, .playbutton, [data-playable-media]'),
-                                presentation: has('.pp-present, [class*="pp-present"], .presentation, .is-presentation')
+                                presentation: has('.pp-present, [class*="pp-present"], .presentation, .is-presentation, [class*="flashcard"]') || rubricText.includes('flashcard') || (has('video, .video-js, .mejs__playpause-button') && !has('.om-text-gap__droppable, .om-text-gap__target-item, .is-dropdown, input[type="text"], input[type="radio"], textarea')) || (!has('.om-text-gap__droppable, .om-text-gap__target-item, .is-dropdown, input[type="text"], input[type="radio"], textarea, .choice_interaction, .matching_interaction, .osSorting') && has('.screen, .content-wrap'))
                             };
                         }
 
@@ -83,7 +83,7 @@ class ExerciseDetector:
                             multichoice: hasVis('input[type="radio"], .radio-group, .choice_interaction'),
                             fillblank: hasVis('input.textGapItem__input, .textgap input, input[type="text"], textarea'),
                             listening: hasVis('audio, .audio-player, .playbutton'),
-                            presentation: hasVis('.pp-present, .presentation')
+                            presentation: hasVis('.pp-present, .presentation, [class*="flashcard"]') || (document.body && document.body.innerText.toLowerCase().includes('flashcard')) || (hasVis('video, .video-js, .mejs__playpause-button') && !hasVis('.om-text-gap__droppable, .om-text-gap__target-item, .is-dropdown, input[type="text"], input[type="radio"], textarea'))
                         };
                     }""")
                     

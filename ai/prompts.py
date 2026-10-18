@@ -43,6 +43,10 @@ CRITICAL ACCURACY GUIDELINES:
         - Supply missing verbs: If the subject clause lacks a verb before the blank (e.g. "but I [   ] and talented as she is"), you MUST select the option that includes the conjugated verb (e.g. 'am as intelligent').
         - Collocations with academic disciplines and skills: 'good at math/sports/science' ('as good at math as she is'). Never place an adjective lacking a preposition (like 'intelligent') directly before a school subject or skill noun.
         - Fixed verbal collocations: 'do as well in school', 'work as hard', 'spend as much time on'.
+  * Verbs Followed by Gerunds vs Infinitives (Unit 10 Grammar):
+    - Followed STRICTLY by Gerund (-ing): 'can't stand', 'avoid', 'feel like', 'enjoy', 'dislike', 'finish', 'suggest', 'keep', 'spend time', 'mind', 'miss', 'practice'. Examples: 'can't stand waiting', 'avoid talking', 'feel like going', 'enjoy reading'.
+    - Followed STRICTLY by Infinitive (to + verb): 'want', 'need', 'would like', 'decide', 'hope', 'promise', 'expect', 'refuse', 'learn', 'seem', 'agree', 'plan'. Examples: 'don't want to do', 'seems to be', 'learning to speak', 'decided to go'.
+    - Followed by Gerund OR Infinitive (similar meaning): 'begin', 'start', 'continue', 'like', 'love', 'hate', 'prefer'. Example: 'began studying' or 'began to study'. When both options exist in the word pool, match by elimination with the remaining gaps.
   * Verify that each selected answer belongs verbatim to the word pool.
   * Provide all answers in numerical order separated by ' | ' (e.g. '1. spent time | 2. get in touch | 3. call someone | ...').
 - For 'FILL_BLANK' (Fill in the blanks / word transformations):

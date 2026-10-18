@@ -1682,93 +1682,188 @@ class FormFiller:
                         
                     return True, "Actividad enviada (sin errores detectados).", info
                 except Exception as e:
-                    return False, f"Error al verificar resultado: {e}", {}
+                    if "detached" in str(e).lower():
+                        # Iframe was detached by platform upon successful submission
+                        pass
+                    else:
+                        return False, f"Error al verificar resultado: {e}", {}
+
+        # Check outer frames if iframe detached or completed dialog is displayed
+        for outer in [self.page] + getattr(self.page, 'frames', []):
+            try:
+                txt = outer.evaluate("() => document.body ? document.body.innerText.toLowerCase() : ''")
+                if "your activity has been submitted" in txt or "you’re done" in txt or "you're done" in txt:
+                    return True, "Actividad enviada y confirmada por la plataforma.", {"submitted": True}
+            except Exception:
+                pass
                     
         return False, "No se pudo acceder a la evaluación de la actividad.", {}
 
     def click_next_exercise(self, wait_timeout_sec: float = 15.0) -> tuple[bool, str]:
         """
-        Clicks the Next ('forward_lo') button to advance to the next activity in the assignment.
-        Waits until the new activity has loaded.
+        Clicks the Next ('forward_lo', 'Next Activity', or next assignment card) button to advance
+        to the next activity in the assignment. Waits until the new activity has loaded.
         """
-        frames = [self.page] + self.page.frames
+        frames = [self.page] + getattr(self.page, 'frames', [])
         target_frame = None
         prev_url = ""
         prev_title = ""
         for frame in frames:
-            if "cdn_proxy" in frame.url or "avallain" in frame.url:
+            if "cdn_proxy" in getattr(frame, 'url', '') or "avallain" in getattr(frame, 'url', ''):
                 target_frame = frame
-                prev_url = frame.url
+                prev_url = getattr(frame, 'url', '')
                 try:
                     prev_title = frame.evaluate("() => $('.learningObject__title, h1, h2, .lo-title').text().trim() || document.title")
                 except Exception:
                     pass
                 break
 
-        if not target_frame:
-            return False, "No se encontró el marco de la actividad."
+        clicked = False
+        action_desc = ""
 
-        try:
-            clicked = target_frame.evaluate(r"""() => {
-                const $ = window.jQuery;
-                if (!$) return false;
-                const btn = $('button[data-event="forward_lo"], .learningObject__controls-button:contains("Next")').filter(':visible:not(.inactive_button):not([disabled])');
-                if (btn.length > 0) {
-                    btn[0].click();
-                    return true;
-                }
-                return false;
-            }""")
+        # 1. Try inside activity frame (forward_lo / Next button)
+        if target_frame:
+            try:
+                clicked = target_frame.evaluate(r"""() => {
+                    const $ = window.jQuery;
+                    if (!$) return false;
+                    const btn = $('button[data-event="forward_lo"], .learningObject__controls-button:contains("Next")').filter(':visible:not(.inactive_button):not([disabled])');
+                    if (btn.length > 0) {
+                        btn[0].click();
+                        return true;
+                    }
+                    return false;
+                }""")
+                if clicked:
+                    action_desc = "botón de avance interno ('Next' / 'forward_lo')"
+            except Exception:
+                pass
 
-            if not clicked:
-                # Outer frames check (Unit Tests and assignments shell)
-                outer_frames = [f for f in frames if "cdn_proxy" not in getattr(f, 'url', '') and "avallain" not in getattr(f, 'url', '')]
-                for outer_frame in outer_frames:
-                    try:
-                        outer_clicked = outer_frame.evaluate(r"""() => {
+        # 2. Try outer frames (Next Activity / Siguiente Actividad dialog or top button)
+        if not clicked:
+            outer_frames = [f for f in frames if "cdn_proxy" not in getattr(f, 'url', '') and "avallain" not in getattr(f, 'url', '')]
+            for outer_frame in outer_frames:
+                try:
+                    res = outer_frame.evaluate(r"""() => {
+                        const btns = Array.from(document.querySelectorAll('button, a[role="button"]'));
+                        // Prioritize 'Next Activity' / 'Siguiente Actividad'
+                        for (const b of btns) {
+                            if (b.offsetParent === null || b.disabled) continue;
+                            const t = (b.textContent || '').trim().toLowerCase();
+                            if (t === 'next activity' || t.includes('next activity') || t.includes('siguiente actividad')) {
+                                b.click();
+                                return { clicked: true, text: t };
+                            }
+                        }
+                        // Next general 'Next' / 'Siguiente'
+                        for (const b of btns) {
+                            if (b.offsetParent === null || b.disabled) continue;
+                            const t = (b.textContent || '').trim().toLowerCase();
+                            if (t === 'next' || t === 'siguiente') {
+                                b.click();
+                                return { clicked: true, text: t };
+                            }
+                        }
+                        return { clicked: false };
+                    }""")
+                    if res and res.get('clicked'):
+                        clicked = True
+                        action_desc = f"botón exterior ('{res.get('text')}')"
+                        break
+                except Exception:
+                    pass
+
+        # 3. If there is a completion dialog with only 'Close' / 'Cerrar', close it and click the next pending activity card
+        if not clicked:
+            for outer_frame in [self.page] + getattr(self.page, 'frames', []):
+                try:
+                    dialog_res = outer_frame.evaluate(r"""() => {
+                        const bodyText = document.body ? document.body.innerText.toLowerCase() : '';
+                        const isSubmitted = bodyText.includes('your activity has been submitted') || bodyText.includes('you’re done') || bodyText.includes('you\'re done');
+                        if (isSubmitted) {
                             const btns = Array.from(document.querySelectorAll('button, a[role="button"]'));
                             for (const b of btns) {
                                 if (b.offsetParent === null || b.disabled) continue;
                                 const t = (b.textContent || '').trim().toLowerCase();
-                                if (t === 'next' || t.includes('next activity') || t.includes('siguiente actividad')) {
+                                if (t === 'close' || t === 'cerrar') {
                                     b.click();
-                                    return true;
+                                    return { closed: true };
                                 }
                             }
-                            return false;
+                        }
+                        return { closed: false };
+                    }""")
+                    if dialog_res and dialog_res.get('closed'):
+                        time.sleep(2.0)
+                        # Now look for next pending activity card on the dashboard
+                        card_clicked = self.page.evaluate(r"""() => {
+                            const cards = Array.from(document.querySelectorAll('.sc-1p4zihu-0, [data-testid="activity-card"]'));
+                            for (const c of cards) {
+                                const scoreElem = c.querySelector('.sc-g6xpn0-5, [data-testid="score"]');
+                                const scoreText = scoreElem ? scoreElem.innerText.trim() : '';
+                                if (!scoreText || scoreText === '-' || scoreText === 'Score -' || scoreText.includes('-')) {
+                                    const clickTarget = c.querySelector('span[title]') || c;
+                                    clickTarget.click();
+                                    return { clicked: true, title: c.innerText.substring(0, 50) };
+                                }
+                            }
+                            return { clicked: false };
                         }""")
-                        if outer_clicked:
+                        if card_clicked and card_clicked.get('clicked'):
                             clicked = True
+                            action_desc = f"siguiente tarjeta pendiente ('{card_clicked.get('title')}')"
                             break
-                    except Exception:
-                        pass
-            
-            if not clicked:
-                return False, "No se encontró el botón de siguiente ejercicio ('Next' / 'forward_lo'). Es posible que la asignación haya terminado."
-
-            # Wait for transition: poll until frame URL or title changes and new interaction is ready
-            time.sleep(2.0)
-            start_t = time.time()
-            while time.time() - start_t < wait_timeout_sec:
-                try:
-                    cdn_frames = [f for f in self.page.frames if "cdn_proxy" in f.url or "avallain" in f.url]
-                    if cdn_frames:
-                        cur_frame = cdn_frames[0]
-                        cur_url = cur_frame.url
-                        cur_title = cur_frame.evaluate("() => $('.learningObject__title, h1, h2, .lo-title').text().trim() || document.title")
-                        if cur_url != prev_url or cur_title != prev_title:
-                            # Check if the interaction DOM is mounted
-                            is_mounted = cur_frame.evaluate("() => $('.interaction, .package, .learningObject').length > 0")
-                            if is_mounted:
-                                time.sleep(1.5)  # Wait for MVC models/views to attach
-                                return True, "Se avanzó exitosamente al siguiente ejercicio."
+                        else:
+                            return True, "Asignación completada. Se cerró el diálogo de finalización."
                 except Exception:
                     pass
-                time.sleep(0.5)
-                
-            return True, "Se avanzó exitosamente al siguiente ejercicio."
-        except Exception as e:
-            return False, f"Error al hacer clic en siguiente ejercicio: {e}"
+
+        if not clicked:
+            # Also check if already on assignment dashboard with pending cards
+            try:
+                card_clicked = self.page.evaluate(r"""() => {
+                    const cards = Array.from(document.querySelectorAll('.sc-1p4zihu-0, [data-testid="activity-card"]'));
+                    for (const c of cards) {
+                        const scoreElem = c.querySelector('.sc-g6xpn0-5, [data-testid="score"]');
+                        const scoreText = scoreElem ? scoreElem.innerText.trim() : '';
+                        if (!scoreText || scoreText === '-' || scoreText === 'Score -' || scoreText.includes('-')) {
+                            const clickTarget = c.querySelector('span[title]') || c;
+                            clickTarget.click();
+                            return { clicked: true, title: c.innerText.substring(0, 50) };
+                        }
+                    }
+                    return { clicked: false };
+                }""")
+                if card_clicked and card_clicked.get('clicked'):
+                    clicked = True
+                    action_desc = f"tarjeta pendiente abierta ('{card_clicked.get('title')}')"
+            except Exception:
+                pass
+
+        if not clicked:
+            return False, "No se encontró el botón de siguiente ejercicio ('Next' / 'Next Activity') ni actividades pendientes."
+
+        # Wait for transition: poll until frame URL or title changes and new interaction is ready
+        time.sleep(2.0)
+        start_t = time.time()
+        while time.time() - start_t < wait_timeout_sec:
+            try:
+                cdn_frames = [f for f in self.page.frames if "cdn_proxy" in getattr(f, 'url', '') or "avallain" in getattr(f, 'url', '')]
+                if cdn_frames:
+                    cur_frame = cdn_frames[0]
+                    cur_url = getattr(cur_frame, 'url', '')
+                    cur_title = cur_frame.evaluate("() => $('.learningObject__title, h1, h2, .lo-title').text().trim() || document.title")
+                    if cur_url != prev_url or cur_title != prev_title or not prev_url:
+                        # Check if interaction DOM is mounted
+                        is_mounted = cur_frame.evaluate("() => $('.interaction, .package, .learningObject, video, audio, .activity').length > 0")
+                        if is_mounted:
+                            time.sleep(1.5)
+                            return True, f"Se avanzó exitosamente ({action_desc})."
+            except Exception:
+                pass
+            time.sleep(0.5)
+
+        return True, f"Se avanzó al siguiente ejercicio ({action_desc})."
 
     def has_next_screen(self) -> bool:
         """

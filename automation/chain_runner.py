@@ -89,10 +89,40 @@ class ChainRunner:
                 page_info = detector.get_assignment_info()
                 assignment_title = page_info.get("title", "Asignación NGL")
 
+                filler = FormFiller(page)
+
+                # Check if we need to advance from a completion dialog or open a pending card from dashboard
+                has_cdn = any("cdn_proxy" in getattr(f, 'url', '') or "avallain" in getattr(f, 'url', '') for f in getattr(page, 'frames', []))
+                if not has_cdn:
+                    needs_advance = False
+                    try:
+                        res = page.evaluate("""() => {
+                            const body = document.body ? document.body.innerText.toLowerCase() : '';
+                            return body.includes('your activity has been submitted') || body.includes('you’re done') || document.querySelectorAll('.sc-1p4zihu-0').length > 0;
+                        }""")
+                        if res is True:
+                            needs_advance = True
+                    except Exception:
+                        needs_advance = False
+
+                    if needs_advance:
+                        next_ok, next_msg = filler.click_next_exercise()
+                        if not next_ok:
+                            notify("completed", {
+                                "message": f"Asignación finalizada. Se resolvieron {solved_count} ejercicios exitosamente al 100%."
+                            })
+                            return {
+                                "status": "completed",
+                                "total_solved": solved_count,
+                                "reason": "Asignación finalizada sin más ejercicios.",
+                                "history": history,
+                            }
+                        time.sleep(2.0)
+
                 # Get exercise title from iframe or heading
                 exercise_title = "Ejercicio"
                 for f in page.frames:
-                    if "cdn_proxy" in f.url or "avallain" in f.url:
+                    if "cdn_proxy" in getattr(f, 'url', '') or "avallain" in getattr(f, 'url', ''):
                         try:
                             t = f.evaluate("() => $('.learningObject__title, h1, h2, .lo-title').text().trim() || document.title")
                             if t:
@@ -107,8 +137,6 @@ class ChainRunner:
                     "exercise_title": exercise_title,
                     "message": f"Analizando ejercicio {solved_count + 1}: {exercise_title}"
                 })
-
-                filler = FormFiller(page)
 
                 # Check if current activity was already submitted with 100% success or finalized
                 is_already_completed = False
