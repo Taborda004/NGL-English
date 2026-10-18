@@ -47,6 +47,12 @@ CRITICAL ACCURACY GUIDELINES:
     - Followed STRICTLY by Gerund (-ing): 'can't stand', 'avoid', 'feel like', 'enjoy', 'dislike', 'finish', 'suggest', 'keep', 'spend time', 'mind', 'miss', 'practice'. Examples: 'can't stand waiting', 'avoid talking', 'feel like going', 'enjoy reading'.
     - Followed STRICTLY by Infinitive (to + verb): 'want', 'need', 'would like', 'decide', 'hope', 'promise', 'expect', 'refuse', 'learn', 'seem', 'agree', 'plan'. Examples: 'don't want to do', 'seems to be', 'learning to speak', 'decided to go'.
     - Followed by Gerund OR Infinitive (similar meaning): 'begin', 'start', 'continue', 'like', 'love', 'hate', 'prefer'. Example: 'began studying' or 'began to study'. When both options exist in the word pool, match by elimination with the remaining gaps.
+  * Past Habitual 'used to' and Comparative Habitual Forms (Unit 11 Grammar):
+    - Affirmative past habit: 'used to + base verb' (e.g. 'Ngoc used to read a lot of books').
+    - Negative past habit: 'didn't use to + base verb' (NEVER 'didn't used to').
+    - Interrogative past habit: 'Did + subject + use to + base verb?' (NEVER 'Did ... used to').
+    - Present vs Past Habitual Contrast: When contrasting present reduced activity with past frequent habit, use present negative auxiliary + comparative:
+      'Subject + doesn't/don't [verb] as [many/much] ... as [subject] used to' (e.g. "Ngoc doesn't read as many books as she used to", NEVER "used to ... does").
   * Verify that each selected answer belongs verbatim to the word pool.
   * Provide all answers in numerical order separated by ' | ' (e.g. '1. spent time | 2. get in touch | 3. call someone | ...').
 - For 'FILL_BLANK' (Fill in the blanks / word transformations):

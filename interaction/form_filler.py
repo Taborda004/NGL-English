@@ -1773,29 +1773,44 @@ class FormFiller:
                 except Exception:
                     pass
 
-        # 3. If there is a completion dialog with only 'Close' / 'Cerrar', close it and click the next pending activity card
+        # 3. If there is a completion dialog with 'Close' / 'Cerrar', close it and proceed to next activity
         if not clicked:
             for outer_frame in [self.page] + getattr(self.page, 'frames', []):
                 try:
                     dialog_res = outer_frame.evaluate(r"""() => {
                         const bodyText = document.body ? document.body.innerText.toLowerCase() : '';
-                        const isSubmitted = bodyText.includes('your activity has been submitted') || bodyText.includes('you’re done') || bodyText.includes('you\'re done');
+                        const hasDialog = document.querySelector('[role="dialog"], .modal, .assessment-dialog') !== null;
+                        const isSubmitted = bodyText.includes('your activity has been submitted') || bodyText.includes('you’re done') || bodyText.includes('you\'re done') || hasDialog;
                         if (isSubmitted) {
                             const btns = Array.from(document.querySelectorAll('button, a[role="button"]'));
+                            // Check Next Activity first
+                            for (const b of btns) {
+                                if (b.offsetParent === null || b.disabled) continue;
+                                const t = (b.textContent || '').trim().toLowerCase();
+                                if (t.includes('next activity') || t.includes('siguiente actividad')) {
+                                    b.click();
+                                    return { handled: true, action: 'next_activity' };
+                                }
+                            }
+                            // Then Close
                             for (const b of btns) {
                                 if (b.offsetParent === null || b.disabled) continue;
                                 const t = (b.textContent || '').trim().toLowerCase();
                                 if (t === 'close' || t === 'cerrar') {
                                     b.click();
-                                    return { closed: true };
+                                    return { handled: true, action: 'close' };
                                 }
                             }
                         }
-                        return { closed: false };
+                        return { handled: false };
                     }""")
-                    if dialog_res and dialog_res.get('closed'):
+                    if dialog_res and dialog_res.get('handled'):
                         time.sleep(2.0)
-                        # Now look for next pending activity card on the dashboard
+                        if dialog_res.get('action') == 'next_activity':
+                            clicked = True
+                            action_desc = "botón 'Next Activity' del diálogo"
+                            break
+                        # If closed, look for next pending activity card on the dashboard
                         card_clicked = self.page.evaluate(r"""() => {
                             const cards = Array.from(document.querySelectorAll('.sc-1p4zihu-0, [data-testid="activity-card"]'));
                             for (const c of cards) {
@@ -1813,13 +1828,11 @@ class FormFiller:
                             clicked = True
                             action_desc = f"siguiente tarjeta pendiente ('{card_clicked.get('title')}')"
                             break
-                        else:
-                            return True, "Asignación completada. Se cerró el diálogo de finalización."
                 except Exception:
                     pass
 
+        # 4. Check if on assignment dashboard with pending cards
         if not clicked:
-            # Also check if already on assignment dashboard with pending cards
             try:
                 card_clicked = self.page.evaluate(r"""() => {
                     const cards = Array.from(document.querySelectorAll('.sc-1p4zihu-0, [data-testid="activity-card"]'));
@@ -1837,6 +1850,28 @@ class FormFiller:
                 if card_clicked and card_clicked.get('clicked'):
                     clicked = True
                     action_desc = f"tarjeta pendiente abierta ('{card_clicked.get('title')}')"
+            except Exception:
+                pass
+
+        # 5. Check if all cards in current assignment are finished, and check for next pending assignment
+        if not clicked:
+            try:
+                cross_assign_clicked = self.page.evaluate(r"""() => {
+                    // Check if on main assignments list or if Back button is available
+                    const backBtn = document.querySelector('a[href*="/dashboard/assignments"], button:has-text("Back")');
+                    const assignLinks = Array.from(document.querySelectorAll('a[href*="/dashboard/assignments/"]'));
+                    for (const a of assignLinks) {
+                        const txt = (a.innerText || '').toLowerCase();
+                        if (txt.includes('score\n-') || txt.includes('score -') || txt.includes('0 %') || txt.includes('0%')) {
+                            a.click();
+                            return { clicked: true, title: a.innerText.substring(0, 50) };
+                        }
+                    }
+                    return { clicked: false };
+                }""")
+                if cross_assign_clicked and cross_assign_clicked.get('clicked'):
+                    clicked = True
+                    action_desc = f"nueva asignación pendiente abierta ('{cross_assign_clicked.get('title')}')"
             except Exception:
                 pass
 
