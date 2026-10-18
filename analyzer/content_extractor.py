@@ -55,6 +55,24 @@ class ContentExtractor:
                                 }
                             }
                             
+                            // Si es un ejercicio de Drag & Drop (om-text-gap), listar las palabras disponibles de forma limpia
+                            const dragItems = target.find('.drag_holder, .om-text-gap__drag-item, .om-text-gap__item');
+                            const dropGaps = target.find('.om-text-gap__target-item');
+                            if (dragItems.length > 0 && dropGaps.length > 0) {
+                                const seenWords = new Set();
+                                const uniqueWords = [];
+                                dragItems.each(function() {
+                                    const w = $(this).text().trim().replace(/\s+/g, ' ');
+                                    if (w && !seenWords.has(w.toLowerCase())) {
+                                        seenWords.add(w.toLowerCase());
+                                        uniqueWords.push(w);
+                                    }
+                                });
+                                if (uniqueWords.length > 0) {
+                                    content += '\n\n--- AVAILABLE DRAGGABLE WORDS ---\n' + uniqueWords.join(', ');
+                                }
+                            }
+                            
                             const segs = Array.from(document.querySelectorAll('.transcript-segment, .player__transcript-body p'))
                                 .map(p => p.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean);
                             const transcript = segs.length > 0 ? ("\n\n--- VIDEO / AUDIO TRANSCRIPT ---\n" + segs.join(' ')) : '';

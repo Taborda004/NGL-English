@@ -22,8 +22,12 @@ CRITICAL ACCURACY GUIDELINES:
   Provide the exact selected option for each blank in order, clearly numbered and separated by ' | ' (e.g. "1. I'm not going to | 2. I'll | 3. I'm going to | ...").
 - For 'DRAG_AND_DROP' (Gapfill drag activity / word pool):
   Match each gap with the EXACT matching item from the draggable word pool.
-  Pay close attention to audio/video transcripts, precise collocations, verbs and prepositions (e.g. distinguishing between "washes" and "swims"). Ensure every chosen word exists in the pool.
-  Provide all answers in numerical order separated by ' | ' (e.g. '1. ceremony | 2. special building | ...').
+  * Collocations, Prepositions and Transitivity: Before placing an item, ALWAYS inspect the words and prepositions immediately before and after the gap:
+    - Never place a transitive verb phrase with an embedded direct object (e.g. 'call someone') before a prepositional phrase (e.g. 'with her') when a phrasal verb/idiom requiring that exact preposition (e.g. 'get in touch with') is available.
+    - Match fixed prepositions strictly: 'get in touch with', 'stay in touch with', 'spent time with', 'pass time on', 'on silent', 'attend the meeting', 'get a signal on'.
+    - Contextual contrast: When choosing between similar adjectives, analyze subsequent sentence clues (e.g. 'so bored every day' indicates 'dull'; 'disappointed with lack of fulfillment' indicates 'unsatisfying').
+  * Verify that each selected answer belongs verbatim to the word pool.
+  * Provide all answers in numerical order separated by ' | ' (e.g. '1. spent time | 2. get in touch | 3. call someone | ...').
 - For 'FILL_BLANK' (Fill in the blanks / word transformations):
   Provide only the target English words to fill in, numbered and separated by ' | ' (e.g. '1. application | 2. intend | 3. arrangement | ...').
   - For agreement with 'so', 'neither', 'too', 'either':
