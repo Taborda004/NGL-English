@@ -64,6 +64,10 @@ def print_error(msg: str) -> None:
     print(f"  {RED}[ERROR] {msg}{RESET}")
 
 
+def print_info(msg: str) -> None:
+    print(f"  {CYAN}[INFO] {msg}{RESET}")
+
+
 def verify_python_version() -> None:
     """Verifica que la versión de Python en ejecución cumpla los requisitos mínimos."""
     if sys.version_info < MIN_PYTHON_VERSION:
@@ -227,9 +231,12 @@ def get_browser_catalog() -> dict[str, tuple[str, list[str], str]]:
                 "Opera GX",
                 [
                     os.path.expandvars(r"%LocalAppData%\Programs\Opera GX\launcher.exe"),
+                    os.path.expandvars(r"%LocalAppData%\Programs\Opera GX\opera.exe"),
                     os.path.expandvars(r"%ProgramFiles%\Opera GX\launcher.exe"),
+                    os.path.expandvars(r"%ProgramFiles%\Opera GX\opera.exe"),
                     os.path.expandvars(r"%ProgramFiles(x86)%\Opera GX\launcher.exe"),
                     os.path.expandvars(r"%AppData%\Opera Software\Opera GX Stable\launcher.exe"),
+                    os.path.expandvars(r"%AppData%\Opera Software\Opera GX Stable\opera.exe"),
                 ],
                 "opera"
             ),
@@ -237,9 +244,12 @@ def get_browser_catalog() -> dict[str, tuple[str, list[str], str]]:
                 "Opera Estándar",
                 [
                     os.path.expandvars(r"%LocalAppData%\Programs\Opera\launcher.exe"),
+                    os.path.expandvars(r"%LocalAppData%\Programs\Opera\opera.exe"),
                     os.path.expandvars(r"%ProgramFiles%\Opera\launcher.exe"),
+                    os.path.expandvars(r"%ProgramFiles%\Opera\opera.exe"),
                     os.path.expandvars(r"%ProgramFiles(x86)%\Opera\launcher.exe"),
                     os.path.expandvars(r"%AppData%\Opera Software\Opera Stable\launcher.exe"),
+                    os.path.expandvars(r"%AppData%\Opera Software\Opera Stable\opera.exe"),
                 ],
                 "opera"
             ),
@@ -362,10 +372,26 @@ def _handle_selected_browser(name: str, paths: list[str], cmd: str) -> None:
 
     if not path:
         print_warning(f"\nNo se localizó {name} en las rutas estándar.")
-        custom = input("¿Deseas ingresar la ruta completa del ejecutable? (Enter para omitir): ").strip().strip('"')
-        if custom and os.path.isfile(custom):
-            path = custom
-        else:
+        custom = input("¿Deseas ingresar la ruta completa del ejecutable? (Enter para omitir): ").strip().strip('"').strip("'")
+        if custom:
+            if os.path.isfile(custom):
+                path = custom
+            elif os.path.isdir(custom):
+                for cand in ["launcher.exe", "opera.exe", "brave.exe", "chrome.exe", "msedge.exe", "vivaldi.exe"]:
+                    cand_path = os.path.join(custom, cand)
+                    if os.path.isfile(cand_path):
+                        path = cand_path
+                        break
+                if not path:
+                    for root, dirs, files in os.walk(custom):
+                        for cand in ["launcher.exe", "opera.exe", "brave.exe", "chrome.exe", "msedge.exe"]:
+                            if cand in files:
+                                path = os.path.join(root, cand)
+                                break
+                        if path:
+                            break
+
+        if not path:
             print_info("Continuando sin abrir el navegador. Podrás abrirlo manualmente.")
             return
 
