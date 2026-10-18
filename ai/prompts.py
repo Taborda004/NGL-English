@@ -32,6 +32,9 @@ CRITICAL ACCURACY GUIDELINES:
     - Never place a transitive verb phrase with an embedded direct object (e.g. 'call someone') before a prepositional phrase (e.g. 'with her') when a phrasal verb/idiom requiring that exact preposition (e.g. 'get in touch with') is available.
     - Match fixed prepositions strictly: 'get in touch with', 'stay in touch with', 'spent time with', 'pass time on', 'on silent', 'attend the meeting', 'get a signal on'.
     - Contextual contrast: When choosing between similar adjectives, analyze subsequent sentence clues (e.g. 'so bored every day' indicates 'dull'; 'disappointed with lack of fulfillment' indicates 'unsatisfying').
+    - Distinguishing 'Would you mind' vs 'Do you mind': ALWAYS check the verb tense in the following 'if' clause:
+      * If followed by a PAST tense verb (e.g. 'if I took...', 'if we talked...', 'if I borrowed...'), you MUST use 'Would you mind' (or 'Would it be').
+      * If followed by a PRESENT tense verb (e.g. 'if I stand...', 'if I make...', 'if I leave...'), you MUST use 'Do you mind'.
   * Verify that each selected answer belongs verbatim to the word pool.
   * Provide all answers in numerical order separated by ' | ' (e.g. '1. spent time | 2. get in touch | 3. call someone | ...').
 - For 'FILL_BLANK' (Fill in the blanks / word transformations):
