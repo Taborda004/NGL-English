@@ -20,6 +20,12 @@ CRITICAL ACCURACY GUIDELINES:
   * Audio matching (Listen to audio clips and match to target words): Each audio clip on the left matches one target word on the right. Format as: '1. Audio 1 = target word | 2. Audio 2 = target word | ...' in the exact top-to-bottom order of the audio clips. Listen carefully to what each audio clip says and match it to the correct target word.
 - For 'DROPDOWN' (Inline dropdown selection / listbox):
   Provide the exact selected option for each blank in order, clearly numbered and separated by ' | ' (e.g. "1. I'm not going to | 2. I'll | 3. I'm going to | ...").
+  * Rules for Polite Requests and Permissions:
+    - 'Would it be OK if + subject + PAST SIMPLE' (e.g. 'Would it be OK if we stayed here tonight?').
+    - 'Would you mind if + subject + PAST SIMPLE' (e.g. 'Would you mind if we talked about this tomorrow?', 'Would you mind if I called you back a bit later?'). NEVER use bare present forms like 'we talk'.
+    - 'Do you mind if + subject + PRESENT SIMPLE' (e.g. 'Do you mind if I make a phone call?').
+    - 'Would you mind + VERB-ING' (e.g. 'Would you mind helping me?').
+    - Modal requests for permission: 'Could I borrow...', 'May I use...', 'Can I ask...'.
 - For 'DRAG_AND_DROP' (Gapfill drag activity / word pool):
   Match each gap with the EXACT matching item from the draggable word pool.
   * Collocations, Prepositions and Transitivity: Before placing an item, ALWAYS inspect the words and prepositions immediately before and after the gap:

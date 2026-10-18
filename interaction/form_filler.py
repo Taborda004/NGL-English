@@ -1362,7 +1362,7 @@ class FormFiller:
                                 let chosenLi = null;
                                 
                                 if (m && m.choices) {
-                                    const corr = m.choices.find(c => ('correctIndex' in c && c.correctIndex === true) || c.isCorrect);
+                                    const corr = m.choices.find(c => (c.correctIndex !== null && c.correctIndex !== undefined) || c.isCorrect || c.correct === true);
                                     if (corr) {
                                         const cTxt = $(corr.content).text().trim() || corr.text || corr.content;
                                         if (cTxt) targetChoiceText = cTxt.toLowerCase().trim();
