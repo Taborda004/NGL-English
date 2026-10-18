@@ -38,6 +38,11 @@ CRITICAL ACCURACY GUIDELINES:
     - Grammatical Inflection and Subject-Verb Agreement:
       * When a blank is preceded by the infinitive particle 'to' (e.g. 'uses it to [   ]', 'likes to [   ]'), you MUST select a base/infinitive verb (e.g. 'stay in touch'), NEVER an inflected verb with '-s' (e.g. 'loves communicating') or past tense.
       * When a singular subject (e.g. 'Mrs. Harris', 'he', 'she') directly precedes the blank as the main subject of the clause, the verb MUST agree in number (e.g. 'loves communicating'), NEVER an uninflected base verb (e.g. 'stay in touch').
+      * Comparative Equality '(not) as ... as' and Verb Consistency:
+        - Avoid duplicate verbs: If the clause already contains a form of 'be' (e.g. "and I'm definitely not [   ]"), NEVER pick an option that includes 'am' / 'is' / 'are' (e.g. 'am as intelligent' would duplicate 'am' -> "I'm ... not am"). Select 'as good at' instead.
+        - Supply missing verbs: If the subject clause lacks a verb before the blank (e.g. "but I [   ] and talented as she is"), you MUST select the option that includes the conjugated verb (e.g. 'am as intelligent').
+        - Collocations with academic disciplines and skills: 'good at math/sports/science' ('as good at math as she is'). Never place an adjective lacking a preposition (like 'intelligent') directly before a school subject or skill noun.
+        - Fixed verbal collocations: 'do as well in school', 'work as hard', 'spend as much time on'.
   * Verify that each selected answer belongs verbatim to the word pool.
   * Provide all answers in numerical order separated by ' | ' (e.g. '1. spent time | 2. get in touch | 3. call someone | ...').
 - For 'FILL_BLANK' (Fill in the blanks / word transformations):
