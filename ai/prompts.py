@@ -53,6 +53,12 @@ CRITICAL ACCURACY GUIDELINES:
     - Interrogative past habit: 'Did + subject + use to + base verb?' (NEVER 'Did ... used to').
     - Present vs Past Habitual Contrast: When contrasting present reduced activity with past frequent habit, use present negative auxiliary + comparative:
       'Subject + doesn't/don't [verb] as [many/much] ... as [subject] used to' (e.g. "Ngoc doesn't read as many books as she used to", NEVER "used to ... does").
+  * Present Perfect vs Simple Past and Modals of Obligation (Unit 12 Grammar):
+    - 'Have you ever + past participle?': Answer with 'Yes, I have' or 'No, I haven't / No, I've never...'.
+    - When mentioning a specific finished past time/event (e.g. 'last year', 'in college', 'when I was...'), use Simple Past (e.g. 'Yes, I have. I flew from Tokyo to Mexico City last year', 'A: Have you ever given... B: Yes, I have. I gave her...').
+    - Past obligation: 'had to + base verb' (affirmative), 'didn't have to + base verb' (negative: lack of obligation in the past).
+    - Present/Future necessity and rules: 'must + base verb' (strong rule/requirement: 'You must have your boarding pass'), 'have to / has to + base verb'.
+    - Travel collocations: 'apply for a visa / student visa', 'book your tickets', 'check in online', 'flight departs / takes off', 'boarding pass', 'delayed flight', 'valid passport'.
   * Verify that each selected answer belongs verbatim to the word pool.
   * Provide all answers in numerical order separated by ' | ' (e.g. '1. spent time | 2. get in touch | 3. call someone | ...').
 - For 'FILL_BLANK' (Fill in the blanks / word transformations):
