@@ -108,12 +108,52 @@ python run.py --browser edge      # Usar Microsoft Edge
 
 Para que el asistente responda preguntas de grabacion de voz de manera automatica:
 
-1. Descarga e instala el controlador gratuito [VB-Audio Virtual Cable](https://vb-audio.com/Cable/).
+1. Descarga e instala el controlador gratuito [VB-Audio Virtual Cable](https://vb-audio.com/Cable/) (Windows / macOS) o crea un dispositivo virtual en Linux.
 2. En la configuracion de sonido de tu sistema operativo, elige **CABLE Input** como salida de reproduccion secundaria.
 3. En Google Chrome:
    - Ve a `Configuracion > Privacidad y seguridad > Configuracion de sitios > Microfono`.
    - Selecciona **CABLE Output (VB-Audio Virtual Cable)** como microfono predeterminado.
 4. El asistente sintetizara la respuesta nativamente en ingles y transmitira el audio directamente al microfono de la plataforma.
+
+### Por que no fallara en equipos externos (Drivers de Audio Opcionales)
+
+Si la maquina clonada (especialmente en Linux o entornos de servidor) no cuenta con drivers o librerias de audio instaladas (`portaudio` o `espeak`), el modulo `interaction/speech_player.py` captura el evento de forma transparente. Esto permite que el asistente resuelva todas las actividades escritas, ejercicios de opcion multiple, clasificaciones (drag-and-drop) y examenes completos sin interrumpirse ni arrojar excepciones.
+
+Si deseas habilitar la reproduccion y transmision de voz en tu sistema, puedes instalar los controladores y librerias correspondientes segun tu sistema operativo:
+
+* **Windows:**
+  - El motor de voz viene preinstalado de forma nativa a traves de Microsoft SAPI5.
+  - Para transmitir audio al microfono del navegador, descarga el instalador oficial de [VB-Audio Virtual Cable](https://vb-audio.com/Cable/).
+
+* **Linux (Ubuntu / Debian / Linux Mint):**
+  - Instala las librerias de audio y sintetizador desde la terminal:
+    ```bash
+    sudo apt update && sudo apt install libportaudio2 espeak ffmpeg -y
+    ```
+  - Para crear un microfono virtual con PulseAudio o PipeWire:
+    ```bash
+    pactl load-module module-null-sink sink_name=VirtualMic sink_properties=device.description=VirtualMic
+    ```
+
+* **Linux (Fedora / RHEL):**
+  - Instala mediante dnf:
+    ```bash
+    sudo dnf install portaudio espeak-ng ffmpeg -y
+    ```
+
+* **Linux (Arch Linux / Manjaro):**
+  - Instala mediante pacman:
+    ```bash
+    sudo pacman -S portaudio espeak-ng ffmpeg
+    ```
+
+* **macOS:**
+  - El sistema cuenta con voces nativas integradas mediante NSSpeechSynthesizer.
+  - Si requieres librerias PortAudio mediante Homebrew:
+    ```bash
+    brew install portaudio
+    ```
+  - Para transmitir al microfono en macOS, descarga la version para Mac de [VB-Audio Virtual Cable](https://vb-audio.com/Cable/).
 
 ---
 
