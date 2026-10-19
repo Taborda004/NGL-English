@@ -31,6 +31,7 @@ def build_binary():
     
     print("\nIniciando compilacion de NGL English Assistant...")
     
+    sep = os.pathsep
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--noconfirm",
@@ -38,15 +39,15 @@ def build_binary():
         "--name=NGL_Assistant",
         f"--distpath={DIST_DIR}",
         f"--workpath={BUILD_DIR}",
-        "--add-data=auth;auth",
-        "--add-data=config;config",
-        "--add-data=ai;ai",
-        "--add-data=analyzer;analyzer",
-        "--add-data=interaction;interaction",
-        "--add-data=browser;browser",
-        "--add-data=automation;automation",
-        "--add-data=app.py;.",
-        "--add-data=.env.example;.",
+        f"--add-data=auth{sep}auth",
+        f"--add-data=config{sep}config",
+        f"--add-data=ai{sep}ai",
+        f"--add-data=analyzer{sep}analyzer",
+        f"--add-data=interaction{sep}interaction",
+        f"--add-data=browser{sep}browser",
+        f"--add-data=automation{sep}automation",
+        f"--add-data=app.py{sep}.",
+        f"--add-data=.env.example{sep}.",
         str(PROJECT_ROOT / "run.py")
     ]
     

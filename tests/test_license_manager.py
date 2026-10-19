@@ -173,3 +173,50 @@ def test_node_locked_license_sharing_violation_mismatched_hwid(tmp_path, monkeyp
     assert details["reason"] == "hwid_credential_sharing_violation"
     assert "clonación detectada" in msg.lower()
 
+
+def test_compute_and_verify_signature():
+    payload = {"key": "TEST-KEY-1", "bound_hwid": "NGL-1111-2222-3333-4444", "status": "active"}
+    sig = LicenseManager.compute_signature(payload)
+    assert isinstance(sig, str)
+    assert len(sig) == 64
+    assert LicenseManager.verify_signature(payload, sig) is True
+    assert LicenseManager.verify_signature(payload, "invalid_sig_1234567890abcdef") is False
+
+
+def test_tampered_signature_rejected(tmp_path, monkeypatch):
+    monkeypatch.setenv("LICENSE_KEY", "")
+    my_hwid = LicenseManager.get_machine_hwid()
+    tampered_entry = {
+        "holder": "Attacker",
+        "bound_hwid": my_hwid,
+        "status": "active",
+        "signature": "forged_signature_000000000000000000000000000000000000000000000000000000"
+    }
+    registry_file = tmp_path / "licenses.json"
+    registry_file.write_text(json.dumps({
+        "system_active": True,
+        "licenses": {"LIC-TAMPERED": tampered_entry}
+    }), encoding="utf-8")
+
+    is_valid, msg, details = LicenseManager.verify(
+        license_key="LIC-TAMPERED",
+        endpoint_url="http://invalid-non-existent-domain-xyz123.test",
+        local_fallback_file=registry_file
+    )
+    assert is_valid is False
+    assert details["reason"] == "cryptographic_signature_invalid"
+    assert "firma criptográfica" in msg.lower()
+
+
+def test_derive_session_key_unique_per_device():
+    hwid_a = "NGL-AAAA-BBBB-CCCC-DDDD"
+    hwid_b = "NGL-1111-2222-3333-4444"
+    key = "LIC-TEST-2026"
+
+    session_a = LicenseManager.derive_session_key(hwid_a, key)
+    session_b = LicenseManager.derive_session_key(hwid_b, key)
+
+    assert isinstance(session_a, str)
+    assert session_a != session_b
+
+
