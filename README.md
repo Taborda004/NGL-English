@@ -2,25 +2,75 @@
 
 Asistente inteligente y autonomo disenado para analizar, resolver y verificar ejercicios y examenes de ingles en la plataforma National Geographic Learning (NGL / Avallain) (`learn.eltngl.com`).
 
-Se conecta a tu sesion activa de Google Chrome o navegadores basados en Chromium mediante el protocolo Chrome DevTools (CDP) sin almacenar credenciales de usuario. Extrae el contexto interactivo (textos, audios, imagenes y modelos de datos MVC de la plataforma), resuelve mediante modelos de Google Gemini y completa los ejercicios garantizando maxima precision.
+Se conecta a tu navegador habitual (Google Chrome, Brave, Opera GX o Edge) mediante el protocolo estandar Chrome DevTools (CDP). No almacena contrasenas de la plataforma, resuelve mediante modelos de Google Gemini y completa las actividades con alta precision.
 
 ---
 
-## Caracteristicas Principales
+## Guia Rapida: Como Clonar y Ejecutar en 3 Pasos
 
-* **Modo Autonomo en Cadena:** Resuelve continuamente ejercicio tras ejercicio dentro de asignaciones completas o examenes multi-pantalla (Unit Tests de hasta 25 pantallas), verificando la finalizacion y avanzando automaticamente.
-* **Modo Asistido Seguro (Sin Enviar):** Resuelve y rellena las respuestas en el formulario del navegador para que el usuario pueda revisarlas antes de enviar manualmente.
-* **Soporte de Ejercicios de Pronunciacion (Speaking):**
-  * Reproduce el audio de la pregunta para que el estudiante escuche el dialogo o enunciado.
-  * Selecciona de forma exacta la opcion correcta en el modelo MVC interno de Avallain y en el DOM.
-  * Emite voz en ingles sintetizada de forma nativa a traves de VB-Audio Virtual Cable, permitiendo que el navegador capture el audio real a traves del microfono.
-* **Resolucion Multimodal con Gemini:** Combina transcripciones, audio MP3, capturas de pantalla y texto DOM estructurado para un analisis contextual riguroso.
-* **Parada de Seguridad Inteligente:** Si la confianza de la inteligencia artificial es inferior al umbral configurado o se detecta un comportamiento inesperado, la ejecucion se pausa de inmediato.
-* **Sistema de Autorizacion y Licenciamiento Autonomo en la Nube:**
-  * Proteccion integral anti-clonacion y anti-distribucion no autorizada.
-  * Vinculacion estricta 1:1 a hardware fisico inmutable (HWID multi-plataforma: Windows, macOS y Linux).
-  * Solicitud de acceso automatizada: los nuevos usuarios introducen su correo y nombre desde el portal web integrado.
-  * Panel de administracion movil en la nube: el propietario (Taborda004) aprueba solicitudes en 1 solo clic o cambia estados mediante selectores desplegables desde cualquier celular en `https://taborda004.github.io/NGL-English/`.
+El proyecto cuenta con un sistema de auto-reproduccion completa. No necesitas crear entornos virtuales ni instalar paquetes manualmente.
+
+### Paso 1: Clonar el repositorio
+Abre una terminal o consola y ejecuta:
+```bash
+git clone https://github.com/Taborda004/NGL-English.git
+cd NGL-English
+```
+
+### Paso 2: Iniciar el programa
+
+* **En Windows (Doble Clic):**
+  Haz doble clic en el archivo `start.bat` (o ejecuta en consola `python run.py`).
+
+* **En macOS o Linux:**
+  Abre la terminal en la carpeta del proyecto y ejecuta:
+  ```bash
+  ./start.sh
+  ```
+  *(O ejecuta directamente `python3 run.py`).*
+
+El script automatizado se encargara de:
+1. Crear el entorno virtual `.venv` aislado si no existe.
+2. Instalar todas las dependencias necesarias de `requirements.txt`.
+3. Configurar Playwright y el navegador de forma silenciosa.
+4. Crear tu archivo de configuracion `.env`.
+5. Iniciar la aplicacion web en tu navegador (`http://localhost:8501`).
+
+### Paso 3: Solicitar Acceso (Solo la primera vez)
+1. Al abrir la interfaz, ve a la pestana **"Solicitar Acceso (Nuevo Usuario)"**.
+2. Escribe tu nombre completo y correo electronico.
+3. Presiona **"Enviar Solicitud de Acceso"**.
+4. Tu identificador unico de equipo (HWID) se enviara a la nube para que el propietario autorice tu dispositivo.
+
+---
+
+## Flujo del Administrador: Como Aprobar Usuarios desde el Celular
+
+El autor o administrador (**Taborda004**) puede autorizar o revocar accesos en cualquier momento sin costo alguno:
+
+1. **Abrir el panel movil en el celular:**
+   Ingresa desde cualquier navegador (Safari o Chrome en tu telefono) a:
+   [https://taborda004.github.io/NGL-English/](https://taborda004.github.io/NGL-English/)
+2. **Identificate:**
+   Introduce tu Clave Maestra de Administrador (tu telefono la recordara para proximas ocasiones).
+3. **Aprobar en 1 Toque:**
+   - En la seccion **Solicitudes Pendientes**, toca el boton verde **`[Aprobar Acceso (1-Clic)]`**.
+   - O utiliza el menu desplegable de cada usuario para cambiar su estado a `Aprobado (Activo)`, `Pendiente` o `Revocado (Suspendido)`.
+4. El usuario queda autorizado de inmediato para entrar en su aplicacion.
+
+---
+
+## Como Usar el Asistente con tus Tareas de NGL
+
+Una vez autorizado el acceso:
+
+1. **Abre tu asignacion:**
+   En la ventana de Chrome que abrio el asistente, ve a [learn.eltngl.com](https://learn.eltngl.com), inicia sesion con tus credenciales de estudiante y abre la actividad o examen que deseas resolver.
+2. **Conecta el asistente:**
+   En la interfaz web del asistente (`http://localhost:8501`), haz clic en **"Conectar Navegador"**. Veras la confirmacion de conexion en la barra lateral.
+3. **Elige tu modo de resolucion:**
+   * **Modo Asistido Seguro (Revisar antes de enviar):** El asistente analiza la pantalla, selecciona las respuestas y rellena los campos, permitiendote revisarlas antes de enviar.
+   * **Modo Autonomo en Cadena:** El asistente resuelve pantalla tras pantalla de forma continua y automatizada hasta terminar la actividad o el examen completo.
 
 ---
 
@@ -33,163 +83,115 @@ Se conecta a tu sesion activa de Google Chrome o navegadores basados en Chromium
 | Drag and Drop | `DRAG_AND_DROP` | Fichas de palabras arrastrables a huecos (`om-text-gap__target-item`). |
 | Dropdown Menus | `DROPDOWN` | Seleccion de opciones en menus desplegables (`listbox`). |
 | Sorting | `SORTING` | Clasificacion de fichas en columnas y categorias (`osSorting`). |
-| Sentence and Word Reordering | `REORDERING` | Ordenar palabras horizontalmente u oraciones completas verticalmente. |
+| Sentence & Word Reordering | `REORDERING` | Ordenar palabras horizontalmente u oraciones completas verticalmente. |
 | Text Highlighting | `HIGHLIGHTING` | Resaltado de frases clave o errores gramaticales (`imMarking`). |
-| Audio and Text Matching | `MATCHING` | Unir con lineas interactivas audios o textos de columnas izquierda/derecha. |
-| Speaking and Voice Recording | `SPEAKING` | Escuchar la pregunta, seleccionar la respuesta y pronunciar por microfono virtual. |
+| Audio & Text Matching | `MATCHING` | Unir con lineas interactivas audios o textos de columnas izquierda/derecha. |
+| Speaking & Voice Recording | `SPEAKING` | Escuchar la pregunta, seleccionar la respuesta y pronunciar por microfono virtual. |
 | Presentation / Study | `PRESENTATION` | Reproduccion y avance de pantallas de lectura o estudio. |
-
----
-
-## Requisitos del Sistema
-
-1. **Python 3.10 o superior**.
-2. **Navegador Chromium**: Google Chrome, Brave Browser, Opera GX o Microsoft Edge.
-3. **Clave de API de Google Gemini**: Obtenible de forma gratuita en [Google AI Studio](https://aistudio.google.com/).
-4. *(Opcional para Speaking)*: Controlador de audio virtual **VB-Audio Virtual Cable** (gratuito en [vb-audio.com/Cable](https://vb-audio.com/Cable/)).
-
----
-
-## Inicio Rapido en 1 Clic (Recomendado para Produccion)
-
-El repositorio incluye lanzadores automatizados que configuran el entorno virtual, instalan dependencias y preparan el navegador sin requerir comandos complejos:
-
-### En Windows
-Haz doble clic en `start.bat` (o `run.bat`), o ejecuta en consola:
-```powershell
-python run.py
-```
-
-### En macOS / Linux
-Otorga permisos de ejecucion y corre `start.sh` (o `run.sh`):
-```bash
-chmod +x start.sh run.sh
-./start.sh
-```
-
-### Acciones que el Lanzador Realiza Automaticamente:
-1. **Entorno Virtual:** Detecta o crea `.venv` y activa el interprete aislado.
-2. **Dependencias:** Instala los paquetes de `requirements.txt` y configura Playwright Chromium si no estuviesen instalados.
-3. **Configuracion de Entorno:** Si no existe `.env`, genera uno a partir de `.env.example` y solicita tu clave de Gemini si falta.
-4. **Deteccion de Navegadores:** Detecta si Chrome, Brave, Opera GX o Edge estan instalados, permitiendo seleccionarlos sin configuraciones invasivas.
-5. **Servidor Streamlit:** Inicia el servidor web local y abre la interfaz grafica en `http://localhost:8501`.
-
----
-
-## Flujo de Licenciamiento y Aprobacion de Usuarios
-
-El software implementa un control de acceso autonomo para proteger la propiedad intelectual contra clonaciones o comparticion indebida de credenciales:
-
-### 1. Usuario Solicitante (Alumno / Cliente)
-1. Al clonar y ejecutar el programa, se abrira el **Portal de Acceso y Licenciamiento**.
-2. En la pestana **"Solicitar Acceso (Nuevo Usuario)"**, el usuario introduce su nombre, correo electronico y nota opcional (ej: grupo o curso).
-3. El sistema captura de manera transparente el identificador inmutable de hardware (HWID) de su maquina y registra la peticion en la nube con estado `PENDIENTE`.
-4. El software permanecera bloqueado hasta que el propietario autorice el acceso.
-
-### 2. Propietario (Taborda004) - Aprobacion desde Celular o PC
-El propietario puede gestionar todas las solicitudes a costo cero desde cualquier lugar:
-* **Desde el Celular (Nube):** Abre el enlace oficial [https://taborda004.github.io/NGL-English/](https://taborda004.github.io/NGL-English/) desde Safari o Chrome.
-* **Aprobacion Inmediata:** Toca el boton verde **`[Aprobar Acceso (1-Clic)]`** o cambia el estado en el menu desplegable a `Aprobado (Activo)`.
-* **Desde la Aplicacion de Escritorio:** En la barra lateral, marca la casilla "Abrir Panel de Control" para gestionar usuarios directamente.
-
-### 3. Proteccion Estricta Anti-Clonacion (Node-Locking)
-* Cuando el usuario aprobado inicia sesion, su cuenta queda ligada a su HWID fisico.
-* Si el usuario comparte su correo o si un tercero clona el repositorio e intenta usar credenciales ajenas en otra computadora, el sistema detecta la discrepancia de hardware y bloquea el acceso de inmediato:
-  > *"Violacion de seguridad y clonacion detectada: Esta cuenta esta vinculada a otro equipo fisico. No esta permitido compartir credenciales ni clonar cuentas en otras maquinas."*
-* Si un usuario cambia legitimamente de computadora, el administrador puede presionar el boton **`[Reset PC]`** en el panel para autorizar la nueva vinculacion.
 
 ---
 
 ## Compatibilidad de Navegadores Chromium
 
-El asistente se comunica mediante el protocolo estandar **Chrome DevTools Protocol (CDP)** en el puerto `9222`:
+El asistente detecta automaticamente los navegadores instalados en tu computadora y te permite elegir con cual trabajar:
+* Google Chrome
 * Brave Browser
 * Opera / Opera GX
 * Microsoft Edge
-* Google Chrome
-* Vivaldi / Arc
+* Vivaldi / Chromium
 
-### Forzar un Navegador Especifico por Linea de Comandos:
-```powershell
-python run.py --browser brave     # Forzar Brave
-python run.py --browser opera     # Forzar Opera / Opera GX
-python run.py --browser edge      # Forzar Microsoft Edge
-python run.py --browser chrome    # Forzar Google Chrome
+### Forzar un navegador especifico por consola (Opcional):
+```bash
+python run.py --browser chrome    # Usar Google Chrome
+python run.py --browser brave     # Usar Brave Browser
+python run.py --browser opera     # Usar Opera / Opera GX
+python run.py --browser edge      # Usar Microsoft Edge
 ```
 
 ---
 
-## Configuracion de Audio para Ejercicios de Speaking
+## Configuracion de Audio para Ejercicios de Pronunciacion (Speaking)
 
-Para resolver de manera desatendida preguntas de pronunciacion en el navegador:
-1. Instala el controlador gratuito [VB-Audio Virtual Cable](https://vb-audio.com/Cable/).
-2. En el panel de sonido del sistema operativo, configura **CABLE Input** como salida de audio o dispositivo secundario.
-3. En el navegador: ve a `Configuracion > Privacidad y seguridad > Microfono` y selecciona **CABLE Output (VB-Audio Virtual Cable)**.
-4. El asistente sintetizara la respuesta nativamente en ingles y transmitira la voz por el cable virtual directamente al microfono de la plataforma.
+Para que el asistente responda preguntas de grabacion de voz de manera automatica:
+
+1. Descarga e instala el controlador gratuito [VB-Audio Virtual Cable](https://vb-audio.com/Cable/).
+2. En la configuracion de sonido de tu sistema operativo, elige **CABLE Input** como salida de reproduccion secundaria.
+3. En Google Chrome:
+   - Ve a `Configuracion > Privacidad y seguridad > Configuracion de sitios > Microfono`.
+   - Selecciona **CABLE Output (VB-Audio Virtual Cable)** como microfono predeterminado.
+4. El asistente sintetizara la respuesta nativamente en ingles y transmitira el audio directamente al microfono de la plataforma.
 
 ---
 
-## Suite de Pruebas y Auditoria de Seguridad
+## Preguntas Frecuentes y Solucion de Problemas
 
-El proyecto cuenta con un conjunto exhaustivo de pruebas unitarias, de integracion y de hacking etico:
+### 1. "Python no se reconoce como un comando interno o externo"
+- **Causa:** Python no esta agregado al PATH del sistema.
+- **Solucion:** Descarga Python 3.10 o superior desde [python.org](https://www.python.org/) y durante la instalacion asegurate de marcar la casilla **"Add python.exe to PATH"**.
+
+### 2. "Donde obtengo mi clave de Gemini API?"
+- Puedes obtener una clave de API gratuita en [Google AI Studio](https://aistudio.google.com/).
+- El lanzador te la solicitara amablemente por consola la primera vez, o puedes escribirla en el archivo `.env`:
+  ```env
+  GEMINI_API_KEY=tu_clave_aqui
+  ```
+
+### 3. "Que pasa si cambio de computadora?"
+- El acceso queda vinculado al hardware del primer equipo autorizado.
+- Si compras o cambias de equipo legitimamente, contacta al propietario para que presione el boton **`[Reset PC]`** en el panel de control movil. Esto te permitira vincular tu nueva maquina al iniciar sesion.
+
+### 4. "Violacion de seguridad y clonacion detectada"
+- Este mensaje aparece si se intenta usar la misma cuenta en dos computadoras distintas simultaneamente o si se copia la carpeta de instalacion a otra maquina. Las credenciales son personales e intransferibles.
+
+---
+
+## Verificacion y Pruebas Automatizadas
+
+Para comprobar el correcto funcionamiento de todos los modulos y la seguridad anti-clonacion:
 
 ```bash
-# Ejecutar todas las pruebas del sistema
+# Ejecutar todas las pruebas del proyecto
 python -m pytest tests/
 
-# Ejecutar especificamente la auditoria de seguridad
+# Ejecutar especificamente la suite de auditoria de seguridad
 python -m pytest tests/test_security_audit.py -v
 ```
 
 ---
 
-## Estructura del Repositorio
+## Estructura del Proyecto
 
 ```text
 NGL-English-Assistant/
-├── .github/workflows/      # Despliegue continuo de GitHub Pages para administracion movil
-├── ai/                     # Integracion con Google Gemini y prompts pedagogicos
-│   ├── prompts.py          # Plantillas estructuradas de prompts
-│   └── solver.py           # Resolvedor multimodal (texto, imagen, audio)
-├── analyzer/               # Inspeccion y analisis semantico del DOM
-│   ├── content_extractor.py # Extractor de elementos interactivos
-│   ├── exercise_detector.py # Clasificador heuristico de ejercicios
-│   └── parser.py           # Parser y validador de respuestas
-├── auth/                   # Sistema de seguridad, HWID y autenticacion en la nube
-│   ├── admin_ui.py         # Interfaz Streamlit del portal de login y panel maestro
-│   ├── cloud_auth.py       # Gestor de solicitudes, aprobaciones y base de datos
-│   └── license_manager.py  # Generacion multi-plataforma de HWID y firmas HMAC
-├── automation/             # Motor de ejecucion continua multi-pantalla
-│   └── chain_runner.py     # Orquestador del flujo autonomo
-├── browser/                # Controlador de sesiones Chromium y CDP
-│   ├── browser_manager.py  # Gestor de contextos de Playwright
-│   └── page_detector.py    # Detector de asignaciones y estado de pantalla
-├── config/                 # Configuraciones globales y variables de entorno
-│   └── settings.py
-├── docs/                   # Portal web administrativo para aprobacion movil (GitHub Pages)
-│   └── index.html
-├── history/                # Registro persistente de sesiones y respuestas
-├── interaction/            # Manipulacion de controles y modelos MVC de Avallain
-│   ├── form_filler.py      # Inyeccion precisa de respuestas en el DOM
-│   └── speech_player.py    # Emision de voz sintetizada por microfono virtual
-├── tests/                  # Suite completa de pruebas y auditoria de seguridad
+├── .github/workflows/      # Despliegue automatico del panel movil en GitHub Pages
+├── ai/                     # Integracion con Google Gemini y modelos multimodales
+├── analyzer/               # Extraccion e inspeccion del DOM de NGL / Avallain
+├── auth/                   # Modulos de autorizacion, HWID y Firebase Cloud Auth
+├── automation/             # Motor de navegacion y resolucion continua multi-pantalla
+├── browser/                # Controlador CDP para Chrome, Brave, Opera y Edge
+├── config/                 # Configuraciones globales del sistema
+├── docs/                   # Portal web administrativo para celular (GitHub Pages)
+├── history/                # Historial de actividades y respuestas
+├── interaction/            # Manipulacion de controles y emision de voz
+├── tests/                  # Suite completa de pruebas unitarias y de seguridad
 ├── admin.html              # Panel web local de administracion
-├── app.py                  # Interfaz grafica principal de usuario (Streamlit)
-├── open_admin.py           # Lanzador directo del portal administrativo en navegador
-├── requirements.txt        # Dependencias de produccion de Python
-├── run.bat                 # Lanzador rapido para Windows
+├── app.py                  # Interfaz grafica de usuario (Streamlit)
+├── build_dist.py           # Compilador a ejecutable binario (.exe)
+├── open_admin.py           # Acceso directo para abrir el panel de administracion
+├── requirements.txt        # Dependencias de Python
+├── run.bat                 # Lanzador para Windows (batch)
 ├── run.py                  # Orquestador maestro multiplataforma
-├── run.sh                  # Lanzador rapido para macOS y Linux
-├── start.bat               # Acceso directo para Windows
-├── start.sh                # Acceso directo para macOS y Linux
+├── run.sh                  # Lanzador para macOS y Linux (bash)
+├── start.bat               # Acceso directo en 1 clic para Windows
+├── start.sh                # Acceso directo en 1 clic para macOS y Linux
 ├── .env.example            # Plantilla limpia de variables de entorno
-└── .gitignore              # Exclusion estricta de secretos y archivos temporales
+└── .gitignore              # Proteccion estricta de secretos y temporales
 ```
 
 ---
 
-## Privacidad y Cumplimiento
+## Privacidad y Seguridad de Datos
 
-* **Credenciales Locales:** Este software no solicita ni almacena contraseñas de la plataforma educativa. La sesion se autentica directamente en el navegador personal del usuario.
-* **Procesamiento de Datos:** La comunicacion entre el software y el navegador se efectua de manera estricta a traves de sockets locales (`127.0.0.1:9222`).
-* **Proteccion de Claves:** Ninguna clave de API privada o credencial de administracion se incluye en el control de versiones.
+* **Sin almacenamiento de credenciales:** El software no pide ni almacena contrasenas de tu institucion ni de NGL. La autenticacion se hace directamente en tu navegador personal.
+* **Procesamiento Local:** Las conexiones de automatizacion ocurren estrictamente dentro de tu computadora a traves del puerto local `localhost:9222`.
+* **Cifrado de Extremo a Extremo:** Toda la verificacion de licencias viaja mediante HTTPS cifrado contra Firebase Realtime Database.
