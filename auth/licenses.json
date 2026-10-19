@@ -1,17 +1,8 @@
 {
   "system_active": true,
   "broadcast_message": "Servicio de NGL English Assistant operativo.",
-  "licenses": {
-    "NGL-KEY-DEMO-2026": {
-      "holder": "Estudiante Autorizado",
-      "bound_hwid": "",
-      "status": "active"
-    }
-  },
-  "authorized_keys": [
-    "OWNER-TABORDA004-MASTER",
-    "NGL-LICENSE-PRO-2026"
-  ],
+  "licenses": {},
+  "authorized_keys": [],
   "authorized_hwids": [],
   "banned_hwids": [],
   "banned_keys": []

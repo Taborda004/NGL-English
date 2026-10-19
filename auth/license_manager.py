@@ -21,7 +21,8 @@ from pathlib import Path
 from typing import Tuple, Dict, Any, Optional
 
 DEFAULT_ENDPOINT = "https://raw.githubusercontent.com/Taborda004/NGL-English/main/auth/licenses.json"
-OWNER_BYPASS_KEY = "OWNER-TABORDA004-MASTER"
+OWNER_KEY_HASH = "582512fa1e68430dcad5bd666ce3c16d94bfa83c1ca638e524e3fdcdb5678c04"
+OWNER_BYPASS_KEY = os.getenv("OWNER_SECRET_KEY", "")
 ROOT_SIGNATURE_SALT = "NGL-CORE-AUTH-SALT-2026-STABLE"
 
 
@@ -29,6 +30,17 @@ class LicenseManager:
     """Administrador criptográfico multiplataforma de licencias y hardware binding."""
 
     _ORIGINAL_VERIFY = None
+
+    @classmethod
+    def is_owner_key(cls, key: Optional[str]) -> bool:
+        """
+        Valida criptográficamente la credencial maestra contra su hash SHA-256.
+        Garantiza que la clave nunca esté expuesta en texto plano en el repositorio.
+        """
+        if not key:
+            return False
+        clean = key.strip()
+        return hashlib.sha256(clean.encode("utf-8")).hexdigest() == OWNER_KEY_HASH
 
     @classmethod
     def _collect_hardware_fingerprint(cls) -> str:
@@ -181,9 +193,9 @@ class LicenseManager:
         key = (license_key if license_key is not None else os.getenv("LICENSE_KEY", "")).strip()
         url = (endpoint_url or os.getenv("AUTH_ENDPOINT_URL", DEFAULT_ENDPOINT)).strip()
 
-        # 1. Validación de clave maestra del autor
-        if key == OWNER_BYPASS_KEY:
-            session_key = cls.derive_session_key(hwid, key)
+        # 1. Validación criptográfica de clave maestra del autor
+        if cls.is_owner_key(key):
+            session_key = cls.derive_session_key(hwid, "OWNER")
             return True, "Acceso concedido mediante credencial maestra del propietario.", {
                 "hwid": hwid,
                 "role": "owner",

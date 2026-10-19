@@ -199,9 +199,9 @@ def ensure_license_authorization() -> None:
     from auth.license_manager import LicenseManager, OWNER_BYPASS_KEY
     from auth.cloud_auth import CloudAuthManager
 
-    # 1. Verificar clave maestra o licencia local
+    # 1. Verificar clave maestra mediante hash criptográfico
     current_key = os.getenv("LICENSE_KEY", "").strip()
-    if current_key == OWNER_BYPASS_KEY:
+    if LicenseManager.is_owner_key(current_key):
         print_success("Acceso concedido mediante credencial maestra del propietario.")
         return
 

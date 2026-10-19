@@ -355,12 +355,18 @@
 
   <script>
     const FIREBASE_URL = "https://ngl-licencias-default-rtdb.firebaseio.com/auth.json";
-    const MASTER_KEY = "OWNER-TABORDA004-MASTER";
+    const MASTER_HASH = "582512fa1e68430dcad5bd666ce3c16d94bfa83c1ca638e524e3fdcdb5678c04";
     let registryData = { users: {} };
 
-    function checkAuth() {
-      const savedKey = sessionStorage.getItem("ngl_admin_key");
-      if (savedKey === MASTER_KEY) {
+    async function sha256(str) {
+      const buffer = new TextEncoder().encode(str);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function checkAuth() {
+      const savedHash = sessionStorage.getItem("ngl_admin_token");
+      if (savedHash === MASTER_HASH) {
         document.getElementById("authModal").style.display = "none";
         loadData();
       } else {
@@ -368,10 +374,11 @@
       }
     }
 
-    function verifyAdminKey() {
+    async function verifyAdminKey() {
       const val = document.getElementById("adminKeyInput").value.trim();
-      if (val === MASTER_KEY) {
-        sessionStorage.setItem("ngl_admin_key", val);
+      const hash = await sha256(val);
+      if (hash === MASTER_HASH) {
+        sessionStorage.setItem("ngl_admin_token", hash);
         document.getElementById("authModal").style.display = "none";
         loadData();
       } else {

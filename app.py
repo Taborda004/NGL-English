@@ -31,8 +31,8 @@ if "user_email" not in st.session_state:
 if "user_name" not in st.session_state:
     st.session_state.user_name = ""
 
-# 1. Comprobar clave maestra del propietario
-is_owner = (settings.LICENSE_KEY or "").strip() == OWNER_BYPASS_KEY
+# 1. Comprobar clave maestra del propietario mediante hash criptográfico
+is_owner = LicenseManager.is_owner_key(settings.LICENSE_KEY)
 if is_owner:
     st.session_state.authenticated = True
     st.session_state.user_role = "owner"

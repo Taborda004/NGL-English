@@ -100,10 +100,11 @@ def test_env_file_is_git_ignored():
 
 def test_owner_key_tampering_rejected(monkeypatch):
     """
-    Auditoría de Seguridad: La clave maestra no debe ser eludible por prefijos o mutaciones.
+    Auditoría de Seguridad: La clave maestra no debe ser eludible por prefijos o mutaciones,
+    y se valida mediante hash SHA-256 seguro.
     """
     monkeypatch.setenv("LICENSE_KEY", "")
-    assert OWNER_BYPASS_KEY == "OWNER-TABORDA004-MASTER"
+    assert LicenseManager.is_owner_key("OWNER-TABORDA004-MASTER") is True
     tampered_keys = [
         "OWNER-TABORDA004-MASTER-EXTRA",
         "OWNER-TABORDA004",
@@ -112,7 +113,7 @@ def test_owner_key_tampering_rejected(monkeypatch):
         " "
     ]
     for tk in tampered_keys:
-        assert tk != OWNER_BYPASS_KEY
+        assert LicenseManager.is_owner_key(tk) is False
         is_valid, _, _ = LicenseManager.verify(license_key=tk)
         assert is_valid is False
 

@@ -83,7 +83,7 @@ def render_login_portal() -> None:
         admin_key = st.text_input("Clave Maestra de Administrador:", type="password", key="portal_admin_key")
         
         if st.button("Validar Credencial de Administrador", key="btn_admin_login"):
-            if admin_key.strip() == OWNER_BYPASS_KEY:
+            if LicenseManager.is_owner_key(admin_key):
                 st.session_state.authenticated = True
                 st.session_state.user_role = "owner"
                 st.session_state.user_name = "Taborda004 (Propietario)"
