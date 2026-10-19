@@ -17,6 +17,7 @@ from .license_manager import LicenseManager
 
 DEFAULT_USERS_FILE = Path(__file__).resolve().parent / "cloud_users.json"
 SESSION_CACHE_FILE = Path.home() / ".ngl_assistant_session.json"
+DEFAULT_CLOUD_ENDPOINT = "https://ngl-licencias-default-rtdb.firebaseio.com/auth.json"
 
 
 class CloudAuthManager:
@@ -27,13 +28,18 @@ class CloudAuthManager:
         """Ruta al almacén local/compartido de usuarios."""
         return DEFAULT_USERS_FILE
 
+    @staticmethod
+    def _email_to_key(email: str) -> str:
+        """Sanitiza el correo para ser una clave válida en Firebase Realtime DB (sin caracteres prohibidos)."""
+        return email.strip().lower().replace("@", "_at_").replace(".", "_dot_").replace("$", "_").replace("#", "_").replace("[", "_").replace("]", "_").replace("/", "_")
+
     @classmethod
     def load_registry(cls, endpoint_url: Optional[str] = None) -> Dict[str, Any]:
         """
         Carga el registro de usuarios desde la nube (si está configurado)
         o desde el archivo persistente local.
         """
-        url = endpoint_url or os.getenv("AUTH_CLOUD_ENDPOINT", "")
+        url = endpoint_url or os.getenv("AUTH_CLOUD_ENDPOINT", DEFAULT_CLOUD_ENDPOINT)
         if url and url.startswith("http"):
             try:
                 req = urllib.request.Request(
@@ -42,7 +48,11 @@ class CloudAuthManager:
                 )
                 with urllib.request.urlopen(req, timeout=5.0) as resp:
                     if resp.status == 200:
-                        return json.loads(resp.read().decode("utf-8"))
+                        data = json.loads(resp.read().decode("utf-8"))
+                        if isinstance(data, dict):
+                            if not isinstance(data.get("users"), dict):
+                                data["users"] = {}
+                            return data
             except Exception:
                 pass
 
@@ -51,7 +61,11 @@ class CloudAuthManager:
         if store_path.exists():
             try:
                 with open(store_path, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    if isinstance(data, dict):
+                        if not isinstance(data.get("users"), dict):
+                            data["users"] = {}
+                        return data
             except Exception:
                 pass
 
@@ -60,7 +74,7 @@ class CloudAuthManager:
     @classmethod
     def save_registry(cls, data: Dict[str, Any], endpoint_url: Optional[str] = None) -> bool:
         """
-        Guarda el registro de usuarios tanto en la nube (POST/PUT) como localmente.
+        Guarda el registro de usuarios tanto en la nube (PUT) como localmente.
         """
         data["meta"] = {"updated_at": datetime.now(timezone.utc).isoformat()}
         success_local = False
@@ -75,8 +89,8 @@ class CloudAuthManager:
         except Exception:
             pass
 
-        # Guardado remoto si existe endpoint con soporte de escritura
-        url = endpoint_url or os.getenv("AUTH_CLOUD_ENDPOINT", "")
+        # Guardado remoto si existe endpoint con soporte de escritura (Firebase Realtime DB / REST)
+        url = endpoint_url or os.getenv("AUTH_CLOUD_ENDPOINT", DEFAULT_CLOUD_ENDPOINT)
         if url and url.startswith("http"):
             try:
                 payload_bytes = json.dumps(data).encode("utf-8")
@@ -84,7 +98,7 @@ class CloudAuthManager:
                     url,
                     data=payload_bytes,
                     headers={"Content-Type": "application/json", "User-Agent": "NGL-CloudAuth/2.0"},
-                    method="POST"
+                    method="PUT"
                 )
                 with urllib.request.urlopen(req, timeout=5.0) as resp:
                     if resp.status in (200, 201, 204):
@@ -107,17 +121,17 @@ class CloudAuthManager:
         if not clean_name:
             return False, "Por favor introduce tu nombre completo."
 
+        user_key = cls._email_to_key(clean_email)
         hwid = LicenseManager.get_machine_hwid()
         data = cls.load_registry()
         users = data.setdefault("users", {})
 
-        if clean_email in users:
-            existing = users[clean_email]
+        if user_key in users:
+            existing = users[user_key]
             status = existing.get("status", "pending")
             if status == "approved":
                 return False, "Este correo ya está aprobado. Ve a la pestaña 'Iniciar Sesión' para acceder."
             elif status == "pending":
-                # Actualizar HWID y fecha por si intenta desde otro equipo
                 existing["hwid"] = hwid
                 existing["note"] = note
                 existing["updated_at"] = datetime.now(timezone.utc).isoformat()
@@ -127,7 +141,7 @@ class CloudAuthManager:
                 return False, "Esta cuenta ha sido suspendida por el administrador. Contacta al propietario."
 
         # Crear nuevo registro pendiente
-        users[clean_email] = {
+        users[user_key] = {
             "name": clean_name,
             "email": clean_email,
             "hwid": hwid,
@@ -158,10 +172,12 @@ class CloudAuthManager:
         data = cls.load_registry()
         users = data.get("users", {})
 
-        if clean_email not in users:
+        user_key = cls._email_to_key(clean_email)
+        target_key = user_key if user_key in users else (clean_email if clean_email in users else None)
+        if not target_key:
             return False, "No existe ninguna cuenta registrada con este correo. Ve a 'Solicitar Acceso'.", {}
 
-        user = users[clean_email]
+        user = users[target_key]
         status = user.get("status", "pending")
 
         if status == "pending":
@@ -254,10 +270,12 @@ class CloudAuthManager:
         data = cls.load_registry()
         users = data.get("users", {})
 
-        if clean_email not in users:
+        user_key = cls._email_to_key(clean_email)
+        target_key = user_key if user_key in users else (clean_email if clean_email in users else None)
+        if not target_key:
             return False, "Usuario no encontrado."
 
-        user = users[clean_email]
+        user = users[target_key]
         user["status"] = "approved"
         user["approved_at"] = datetime.now(timezone.utc).isoformat()
         saved = cls.save_registry(data)
@@ -272,10 +290,12 @@ class CloudAuthManager:
         data = cls.load_registry()
         users = data.get("users", {})
 
-        if clean_email not in users:
+        user_key = cls._email_to_key(clean_email)
+        target_key = user_key if user_key in users else (clean_email if clean_email in users else None)
+        if not target_key:
             return False, "Usuario no encontrado."
 
-        user = users[clean_email]
+        user = users[target_key]
         user["status"] = "revoked"
         user["revoked_at"] = datetime.now(timezone.utc).isoformat()
         saved = cls.save_registry(data)
@@ -293,10 +313,12 @@ class CloudAuthManager:
         data = cls.load_registry()
         users = data.get("users", {})
 
-        if clean_email not in users:
+        user_key = cls._email_to_key(clean_email)
+        target_key = user_key if user_key in users else (clean_email if clean_email in users else None)
+        if not target_key:
             return False, "Usuario no encontrado."
 
-        user = users[clean_email]
+        user = users[target_key]
         user["hwid"] = ""
         user["reset_at"] = datetime.now(timezone.utc).isoformat()
         saved = cls.save_registry(data)
@@ -311,8 +333,10 @@ class CloudAuthManager:
         data = cls.load_registry()
         users = data.get("users", {})
 
-        if clean_email in users:
-            del users[clean_email]
+        user_key = cls._email_to_key(clean_email)
+        target_key = user_key if user_key in users else (clean_email if clean_email in users else None)
+        if target_key:
+            del users[target_key]
             cls.save_registry(data)
             return True, f"Usuario '{clean_email}' eliminado correctamente."
         return False, "Usuario no encontrado."

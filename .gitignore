@@ -21,6 +21,7 @@ build/
 .env
 *.env
 !.env.example
+auth/cloud_users.json
 
 # Scratch files, test recordings & debug dumps
 scratch/
