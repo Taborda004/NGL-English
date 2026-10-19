@@ -36,7 +36,7 @@ is_owner = LicenseManager.is_owner_key(settings.LICENSE_KEY)
 if is_owner:
     st.session_state.authenticated = True
     st.session_state.user_role = "owner"
-    st.session_state.user_name = "Taborda004 (Propietario)"
+    st.session_state.user_name = "Administrador"
 
 # 2. Si no es propietario, comprobar sesión guardada en caché
 if not st.session_state.authenticated:

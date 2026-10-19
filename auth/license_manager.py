@@ -20,7 +20,7 @@ import email.utils
 from pathlib import Path
 from typing import Tuple, Dict, Any, Optional
 
-DEFAULT_ENDPOINT = "https://raw.githubusercontent.com/Taborda004/NGL-English/main/auth/licenses.json"
+DEFAULT_ENDPOINT = os.getenv("AUTH_ENDPOINT_URL", "")
 OWNER_KEY_HASH = "582512fa1e68430dcad5bd666ce3c16d94bfa83c1ca638e524e3fdcdb5678c04"
 OWNER_BYPASS_KEY = os.getenv("OWNER_SECRET_KEY", "")
 ROOT_SIGNATURE_SALT = "NGL-CORE-AUTH-SALT-2026-STABLE"
@@ -348,7 +348,7 @@ class LicenseManager:
         print(" CONTROL DE ACCESO Y LICENCIAMIENTO - NGL ENGLISH ASSISTANT")
         print("=" * 78)
         print(f" Identificador de tu equipo (HWID): {hwid}")
-        print(" Este programa requiere autorización remota del propietario (Taborda004).")
+        print(" Este programa requiere autorización remota del administrador.")
         print("=" * 78)
 
         current_key = os.getenv("LICENSE_KEY", "").strip()

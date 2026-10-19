@@ -54,9 +54,9 @@ def render_login_portal() -> None:
 
     # --- TAB 2: SOLICITAR ACCESO ---
     with tab_register:
-        st.markdown("##### Enviar Solicitud de Acceso al Propietario")
+        st.markdown("##### Enviar Solicitud de Acceso")
         st.info(
-            "Al enviar tu solicitud, el administrador (Taborda004) la recibirá en su panel de control. "
+            "Al enviar tu solicitud, el administrador la recibirá en su panel de control. "
             "En cuanto sea aprobada, podrás entrar inmediatamente con tu correo."
         )
 
@@ -79,14 +79,14 @@ def render_login_portal() -> None:
 
     # --- TAB 3: ACCESO DE ADMINISTRADOR ---
     with tab_admin_login:
-        st.markdown("##### Acceso de Propietario (Taborda004)")
+        st.markdown("##### Acceso de Administrador")
         admin_key = st.text_input("Clave Maestra de Administrador:", type="password", key="portal_admin_key")
         
         if st.button("Validar Credencial de Administrador", key="btn_admin_login"):
             if LicenseManager.is_owner_key(admin_key):
                 st.session_state.authenticated = True
                 st.session_state.user_role = "owner"
-                st.session_state.user_name = "Taborda004 (Propietario)"
+                st.session_state.user_name = "Administrador"
                 st.session_state.admin_panel_open = True
                 st.success("Acceso concedido al panel maestro.")
                 st.rerun()

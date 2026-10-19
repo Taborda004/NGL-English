@@ -103,12 +103,16 @@ def test_owner_key_tampering_rejected(monkeypatch):
     Auditoría de Seguridad: La clave maestra no debe ser eludible por prefijos o mutaciones,
     y se valida mediante hash SHA-256 seguro.
     """
+    import hashlib
+    test_key = "NGL-TEST-OWNER-KEY-12345"
+    test_hash = hashlib.sha256(test_key.encode("utf-8")).hexdigest()
+    monkeypatch.setattr("auth.license_manager.OWNER_KEY_HASH", test_hash)
     monkeypatch.setenv("LICENSE_KEY", "")
-    assert LicenseManager.is_owner_key("OWNER-TABORDA004-MASTER") is True
+    assert LicenseManager.is_owner_key(test_key) is True
     tampered_keys = [
-        "OWNER-TABORDA004-MASTER-EXTRA",
-        "OWNER-TABORDA004",
-        "TABORDA004-MASTER",
+        test_key + "-EXTRA",
+        test_key[:-5],
+        "WRONG-KEY-PREFIX",
         "",
         " "
     ]

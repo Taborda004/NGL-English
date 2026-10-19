@@ -13,7 +13,7 @@ El proyecto cuenta con un sistema de auto-reproduccion completa. No necesitas cr
 ### Paso 1: Clonar el repositorio
 Abre una terminal o consola y ejecuta:
 ```bash
-git clone https://github.com/Taborda004/NGL-English.git
+git clone <URL_DEL_REPOSITORIO>
 cd NGL-English
 ```
 
@@ -40,23 +40,17 @@ El script automatizado se encargara de:
 1. Al abrir la interfaz, ve a la pestana **"Solicitar Acceso (Nuevo Usuario)"**.
 2. Escribe tu nombre completo y correo electronico.
 3. Presiona **"Enviar Solicitud de Acceso"**.
-4. Tu identificador unico de equipo (HWID) se enviara a la nube para que el propietario autorice tu dispositivo.
+4. Tu identificador unico de equipo (HWID) se enviara de forma segura para que el administrador autorice tu dispositivo.
 
 ---
 
-## Flujo del Administrador: Como Aprobar Usuarios desde el Celular
+## Control de Acceso y Autorizaciones
 
-El autor o administrador (**Taborda004**) puede autorizar o revocar accesos en cualquier momento sin costo alguno:
-
-1. **Abrir el panel movil en el celular:**
-   Ingresa desde cualquier navegador (Safari o Chrome en tu telefono) a:
-   [https://taborda004.github.io/NGL-English/](https://taborda004.github.io/NGL-English/)
-2. **Identificate:**
-   Introduce tu Clave Maestra de Administrador (tu telefono la recordara para proximas ocasiones).
-3. **Aprobar en 1 Toque:**
-   - En la seccion **Solicitudes Pendientes**, toca el boton verde **`[Aprobar Acceso (1-Clic)]`**.
-   - O utiliza el menu desplegable de cada usuario para cambiar su estado a `Aprobado (Activo)`, `Pendiente` o `Revocado (Suspendido)`.
-4. El usuario queda autorizado de inmediato para entrar en su aplicacion.
+El software es privado y cuenta con un sistema de autorizacion remota en la nube:
+1. Una vez enviada tu solicitud, tu dispositivo queda registrado en estado pendiente.
+2. El administrador autorizara tu acceso de forma remota.
+3. Una vez aprobada tu peticion, podras ingresar directamente en la pestana "Iniciar Sesion" con tu correo.
+4. Tu cuenta queda vinculada de forma exclusiva a tu equipo para evitar usos no autorizados.
 
 ---
 
@@ -138,7 +132,7 @@ Para que el asistente responda preguntas de grabacion de voz de manera automatic
 
 ### 3. "Que pasa si cambio de computadora?"
 - El acceso queda vinculado al hardware del primer equipo autorizado.
-- Si compras o cambias de equipo legitimamente, contacta al propietario para que presione el boton **`[Reset PC]`** en el panel de control movil. Esto te permitira vincular tu nueva maquina al iniciar sesion.
+- Si compras o cambias de equipo legitimamente, contacta al administrador para restablecer la vinculacion. Esto te permitira registrar tu nueva maquina al iniciar sesion.
 
 ### 4. "Violacion de seguridad y clonacion detectada"
 - Este mensaje aparece si se intenta usar la misma cuenta en dos computadoras distintas simultaneamente o si se copia la carpeta de instalacion a otra maquina. Las credenciales son personales e intransferibles.

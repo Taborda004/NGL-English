@@ -183,7 +183,7 @@ class CloudAuthManager:
         if status == "pending":
             return False, (
                 "Tu cuenta se encuentra PENDIENTE de aprobación. "
-                "El administrador (Taborda004) aún no ha autorizado tu acceso."
+                "El administrador aún no ha autorizado tu acceso."
             ), user
 
         if status in ("revoked", "banned"):

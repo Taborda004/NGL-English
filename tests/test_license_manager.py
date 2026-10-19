@@ -19,9 +19,15 @@ def test_get_machine_hwid_deterministic():
     assert hwid1 == hwid2
 
 
+import hashlib
+
+
 def test_owner_bypass_key(monkeypatch):
-    monkeypatch.setenv("OWNER_SECRET_KEY", "OWNER-TABORDA004-MASTER")
-    is_valid, msg, details = LicenseManager.verify(license_key="OWNER-TABORDA004-MASTER")
+    test_key = "NGL-TEST-OWNER-KEY-12345"
+    test_hash = hashlib.sha256(test_key.encode("utf-8")).hexdigest()
+    monkeypatch.setattr("auth.license_manager.OWNER_KEY_HASH", test_hash)
+    monkeypatch.setenv("OWNER_SECRET_KEY", test_key)
+    is_valid, msg, details = LicenseManager.verify(license_key=test_key)
     assert is_valid is True
     assert details["role"] == "owner"
 
