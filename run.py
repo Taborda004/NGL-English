@@ -100,8 +100,15 @@ def ensure_virtualenv() -> Path:
     
     if not venv_python.exists():
         print("  Creando entorno virtual (.venv)...")
-        subprocess.run([sys.executable, "-m", "venv", str(VENV_DIR)], check=True)
-        print_success("Entorno virtual creado exitosamente.")
+        try:
+            subprocess.run([sys.executable, "-m", "venv", str(VENV_DIR)], check=True)
+            print_success("Entorno virtual creado exitosamente.")
+        except subprocess.CalledProcessError:
+            print_error("No se pudo crear el entorno virtual (.venv).")
+            if platform.system() == "Linux":
+                print_info("En sistemas Debian/Ubuntu, instala el paquete venv ejecutando:")
+                print_info("  sudo apt install python3-venv python3-pip")
+            sys.exit(1)
     else:
         print_success("Entorno virtual (.venv) detectado.")
         
@@ -135,8 +142,12 @@ def ensure_dependencies(venv_python: Path) -> None:
     pw_res = subprocess.run([str(venv_python), "-c", pw_check_code], capture_output=True, text=True)
     if pw_res.returncode != 0:
         print("  Configurando Playwright Chromium...")
-        subprocess.run([str(venv_python), "-m", "playwright", "install", "chromium"], check=True)
-        print_success("Playwright configurado.")
+        try:
+            subprocess.run([str(venv_python), "-m", "playwright", "install", "chromium"], check=True)
+            print_success("Playwright configurado.")
+        except Exception as e:
+            print_warning(f"Aviso al descargar Chromium para Playwright: {e}")
+            print_info("El asistente se conectara directamente a tu navegador mediante CDP.")
 
 
 def ensure_env_configuration() -> None:
