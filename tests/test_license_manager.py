@@ -123,3 +123,53 @@ def test_registry_authorized_hwid(tmp_path, monkeypatch):
     )
     assert is_valid is True
     assert details["role"] == "authorized_hwid"
+
+
+def test_node_locked_license_valid_matching_hwid(tmp_path, monkeypatch):
+    monkeypatch.setenv("LICENSE_KEY", "")
+    my_hwid = LicenseManager.get_machine_hwid()
+    registry_file = tmp_path / "licenses.json"
+    registry_file.write_text(json.dumps({
+        "system_active": True,
+        "licenses": {
+            "LIC-ALEX-2026": {
+                "holder": "Alex",
+                "bound_hwid": my_hwid,
+                "status": "active"
+            }
+        }
+    }), encoding="utf-8")
+
+    is_valid, msg, details = LicenseManager.verify(
+        license_key="LIC-ALEX-2026",
+        endpoint_url="http://invalid-non-existent-domain-xyz123.test",
+        local_fallback_file=registry_file
+    )
+    assert is_valid is True
+    assert details["role"] == "licensed_user_node_locked"
+    assert details["holder"] == "Alex"
+
+
+def test_node_locked_license_sharing_violation_mismatched_hwid(tmp_path, monkeypatch):
+    monkeypatch.setenv("LICENSE_KEY", "")
+    registry_file = tmp_path / "licenses.json"
+    registry_file.write_text(json.dumps({
+        "system_active": True,
+        "licenses": {
+            "LIC-ALEX-2026": {
+                "holder": "Alex",
+                "bound_hwid": "NGL-FOREIGN-PC-9999",
+                "status": "active"
+            }
+        }
+    }), encoding="utf-8")
+
+    is_valid, msg, details = LicenseManager.verify(
+        license_key="LIC-ALEX-2026",
+        endpoint_url="http://invalid-non-existent-domain-xyz123.test",
+        local_fallback_file=registry_file
+    )
+    assert is_valid is False
+    assert details["reason"] == "hwid_credential_sharing_violation"
+    assert "clonación detectada" in msg.lower()
+

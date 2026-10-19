@@ -22,17 +22,50 @@ class LicenseManager:
     """Administra la identificación de hardware y la validación de licencias en la nube."""
 
     @staticmethod
-    def get_machine_hwid() -> str:
+    def _get_platform_uuid() -> str:
+        """Obtiene el identificador criptográfico único del sistema operativo."""
+        sys_name = platform.system()
+        if sys_name == "Windows":
+            try:
+                import winreg
+                key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Cryptography")
+                guid, _ = winreg.QueryValueEx(key, "MachineGuid")
+                return str(guid).strip()
+            except Exception:
+                pass
+        elif sys_name == "Linux":
+            for path in ["/etc/machine-id", "/var/lib/dbus/machine-id"]:
+                if os.path.exists(path):
+                    try:
+                        with open(path, "r", encoding="utf-8") as f:
+                            return f.read().strip()
+                    except Exception:
+                        pass
+        elif sys_name == "Darwin":
+            try:
+                import subprocess
+                cmd = ["ioreg", "-rd1", "-c", "IOPlatformExpertDevice"]
+                out = subprocess.check_output(cmd, text=True)
+                for line in out.splitlines():
+                    if "IOPlatformUUID" in line:
+                        return line.split("=")[-1].strip().strip('"')
+            except Exception:
+                pass
+        return ""
+
+    @classmethod
+    def get_machine_hwid(cls) -> str:
         """
-        Genera un identificador único y determinista de hardware (HWID)
-        basado en la dirección MAC, arquitectura del procesador y nombre de nodo.
+        Genera un identificador único, determinista e inmutable de hardware (HWID)
+        basado en el UUID del sistema operativo, dirección MAC y arquitectura física.
         """
         try:
+            plat_uuid = cls._get_platform_uuid()
             mac = str(uuid.getnode())
             node = platform.node()
             system = platform.system()
             machine = platform.machine()
-            raw_fingerprint = f"{mac}:{node}:{system}:{machine}"
+            raw_fingerprint = f"{plat_uuid}:{mac}:{node}:{system}:{machine}"
             digest = hashlib.sha256(raw_fingerprint.encode("utf-8")).hexdigest().upper()
             return f"NGL-{digest[:4]}-{digest[4:8]}-{digest[8:12]}-{digest[12:16]}"
         except Exception:
@@ -120,6 +153,49 @@ class LicenseManager:
                 "hwid": hwid,
                 "reason": "key_banned"
             }
+
+        # Comprobar licencias estructuradas vinculadas a hardware específico (Node-Locking 1:1)
+        licenses_dict = registry.get("licenses", {})
+        if key and isinstance(licenses_dict, dict):
+            matched_entry = None
+            for lic_k, lic_v in licenses_dict.items():
+                if lic_k.strip().upper() == key.upper():
+                    matched_entry = (lic_k, lic_v)
+                    break
+            
+            if matched_entry:
+                _, lic_data = matched_entry
+                is_active = lic_data.get("active", True) if "active" in lic_data else (lic_data.get("status") == "active")
+                if not is_active:
+                    return False, "Esta clave de licencia ha sido desactivada por el propietario.", {
+                        "hwid": hwid,
+                        "key": key,
+                        "reason": "license_deactivated"
+                    }
+                    
+                bound_hwid = (lic_data.get("bound_hwid") or "").strip().upper()
+                holder = lic_data.get("holder", "Usuario Autorizado")
+                
+                # Si la licencia ya está vinculada a otro equipo físico: BLOQUEO INMEDIATO POR CLONACIÓN
+                if bound_hwid and bound_hwid != hwid.upper():
+                    return False, (
+                        f"Violación de seguridad y clonación detectada: Esta clave de licencia está vinculada "
+                        f"exclusivamente al equipo físico ({bound_hwid}) de {holder}. "
+                        f"No está permitido compartir credenciales ni transferir la instalación a otros dispositivos. "
+                        f"El identificador de este equipo es: {hwid}."
+                    ), {
+                        "hwid": hwid,
+                        "bound_hwid": bound_hwid,
+                        "holder": holder,
+                        "reason": "hwid_credential_sharing_violation"
+                    }
+                    
+                return True, f"Licencia de uso exclusivo validada para {holder}.", {
+                    "hwid": hwid,
+                    "key": key,
+                    "holder": holder,
+                    "role": "licensed_user_node_locked"
+                }
 
         # Comprobar listas de autorización activa
         authorized_hwids = [h.strip().upper() for h in registry.get("authorized_hwids", [])]
