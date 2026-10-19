@@ -15,24 +15,54 @@ from history.history_manager import HistoryManager
 from pathlib import Path
 from automation.chain_runner import ChainRunner
 from config.settings import settings
-from auth.license_manager import LicenseManager
+from auth.license_manager import LicenseManager, OWNER_BYPASS_KEY
+from auth.cloud_auth import CloudAuthManager
+from auth.admin_ui import render_login_portal, render_admin_dashboard
 
 st.set_page_config(page_title="NGL English Assistant", layout="wide")
 
-# Verificación de Licencia y Autorización Remota en la Nube
-auth_valid, auth_msg, auth_details = LicenseManager.verify(
-    license_key=settings.LICENSE_KEY,
-    endpoint_url=settings.AUTH_ENDPOINT_URL,
-    local_fallback_file=Path(__file__).resolve().parent / "auth" / "licenses.json"
-)
+# Inicialización del estado de autenticación y sesión
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+if "user_role" not in st.session_state:
+    st.session_state.user_role = "client"
+if "user_email" not in st.session_state:
+    st.session_state.user_email = ""
+if "user_name" not in st.session_state:
+    st.session_state.user_name = ""
 
-if not auth_valid:
-    st.title("NGL ENGLISH ASSISTANT")
-    st.error(f"[ACCESO DENEGADO] {auth_msg}")
-    st.warning("Este software es privado y está protegido. Se requiere autorización explícita del autor para ejecutarlo.")
-    hwid = LicenseManager.get_machine_hwid()
-    st.info(f"**Identificador de tu equipo (HWID):** `{hwid}`\n\nEnvía este identificador al autor (Taborda004) para habilitar tu acceso.")
-    st.stop()
+# 1. Comprobar clave maestra del propietario
+is_owner = (settings.LICENSE_KEY or "").strip() == OWNER_BYPASS_KEY
+if is_owner:
+    st.session_state.authenticated = True
+    st.session_state.user_role = "owner"
+    st.session_state.user_name = "Taborda004 (Propietario)"
+
+# 2. Si no es propietario, comprobar sesión guardada en caché
+if not st.session_state.authenticated:
+    cached_session = CloudAuthManager.get_cached_session()
+    if cached_session and cached_session.get("email"):
+        c_ok, c_msg, c_user = CloudAuthManager.authenticate_user(cached_session["email"])
+        if c_ok:
+            st.session_state.authenticated = True
+            st.session_state.user_email = cached_session["email"]
+            st.session_state.user_role = "client"
+            st.session_state.user_name = c_user.get("name", "Usuario")
+
+# 3. Si aún no está autenticado, intentar verificación tradicional de licencia
+if not st.session_state.authenticated:
+    auth_valid, auth_msg, auth_details = LicenseManager.verify(
+        license_key=settings.LICENSE_KEY,
+        endpoint_url=settings.AUTH_ENDPOINT_URL,
+        local_fallback_file=Path(__file__).resolve().parent / "auth" / "licenses.json"
+    )
+    if auth_valid:
+        st.session_state.authenticated = True
+        st.session_state.user_role = auth_details.get("role", "licensed_user")
+        st.session_state.user_name = auth_details.get("holder", "Usuario Autorizado")
+    else:
+        render_login_portal()
+        st.stop()
 
 # Prevent Google Chrome Auto-Translate from breaking React DOM reconciliation
 st.html("""
@@ -79,8 +109,30 @@ if info:
     st.sidebar.markdown(f"**Asignación:**\n{info.get('title', 'NGL')}")
     if not settings.GEMINI_API_KEY:
         st.sidebar.error("[AVISO] GEMINI_API_KEY no configurada en .env")
-        st.warning("[AVISO] **Clave de API de Gemini no detectada.** Recuerda configurar tu `GEMINI_API_KEY` en el archivo `.env` para que la IA pueda resolver los ejercicios.")
-    st.sidebar.caption(f"Licencia: {auth_details.get('role', 'Activa')} ({auth_details.get('hwid', '')})")
+    user_role_display = st.session_state.get("user_role", "Activa")
+    user_name_display = st.session_state.get("user_name", "")
+    hwid_display = LicenseManager.get_machine_hwid()
+    st.sidebar.caption(f"Usuario: **{user_name_display}** ({user_role_display}) | HWID: `{hwid_display}`")
+
+    # Si es el propietario, control para abrir el Panel de Administración 1-Clic
+    if st.session_state.get("user_role") == "owner" or is_owner:
+        st.sidebar.markdown("---")
+        st.sidebar.subheader("Administración")
+        open_admin = st.sidebar.checkbox(
+            "Abrir Panel de Control (Aprobar Usuarios en 1-Clic)",
+            value=st.session_state.get("admin_panel_open", False)
+        )
+        if open_admin:
+            render_admin_dashboard()
+            st.stop()
+            
+    # Botón de cerrar sesión para cuentas de clientes
+    if st.session_state.get("user_role") != "owner" and not is_owner:
+        if st.sidebar.button("Cerrar Sesión"):
+            CloudAuthManager.clear_session()
+            st.session_state.authenticated = False
+            st.rerun()
+
     st.sidebar.markdown("---")
 
     # Initialize session state for execution

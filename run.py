@@ -192,18 +192,36 @@ def ensure_env_configuration() -> None:
 
 def ensure_license_authorization() -> None:
     """
-    Verifica la autorización de uso en la nube mediante LicenseManager.
-    Si la clave no está presente o no está autorizada, la solicita al usuario.
-    Si se rechaza, aborta la ejecución para impedir el uso sin consentimiento del autor.
+    Verifica la autorización de uso en la nube mediante LicenseManager o CloudAuthManager.
+    Si ya cuenta con licencia o sesión activa aprobada, continúa automáticamente.
+    Si es un usuario nuevo, le informa que el portal de acceso se iniciará en la interfaz web.
     """
-    from auth.license_manager import LicenseManager
+    from auth.license_manager import LicenseManager, OWNER_BYPASS_KEY
+    from auth.cloud_auth import CloudAuthManager
 
-    is_valid, msg = LicenseManager.ensure_cli_license(ENV_FILE)
-    if not is_valid:
-        print_error(f"Acceso denegado: {msg}")
-        print_info("Para activar este programa, comunícate con el autor (Taborda004).")
-        sys.exit(1)
-    print_success(msg)
+    # 1. Verificar clave maestra o licencia local
+    current_key = os.getenv("LICENSE_KEY", "").strip()
+    if current_key == OWNER_BYPASS_KEY:
+        print_success("Acceso concedido mediante credencial maestra del propietario.")
+        return
+
+    # 2. Verificar sesión de usuario en la nube
+    cached = CloudAuthManager.get_cached_session()
+    if cached and cached.get("email"):
+        ok, msg, _ = CloudAuthManager.authenticate_user(cached["email"])
+        if ok:
+            print_success(f"Sesión activa en la nube verificada: {cached.get('name')} ({cached.get('email')})")
+            return
+
+    # 3. Comprobar licencia tradicional
+    is_valid, msg, _ = LicenseManager.verify(license_key=current_key)
+    if is_valid:
+        print_success(msg)
+        return
+
+    # 4. Si no tiene sesión, advertir amablemente y dejar que el portal web gestione el acceso
+    print_info("No se detectó sesión activa autorizada.")
+    print_info("El Portal de Acceso y Solicitudes Autónomas se abrirá en la interfaz web para iniciar sesión o solicitar permiso.")
 
 
 def is_chrome_debugging_active(port: int = CHROME_DEBUG_PORT) -> bool:
