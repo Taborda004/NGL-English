@@ -5,9 +5,20 @@ Used for automatically answering Speaking exercises in learn.eltngl.com.
 import os
 import tempfile
 import logging
-import sounddevice as sd
-import soundfile as sf
-import pyttsx3
+try:
+    import sounddevice as sd
+except Exception:
+    sd = None
+
+try:
+    import soundfile as sf
+except Exception:
+    sf = None
+
+try:
+    import pyttsx3
+except Exception:
+    pyttsx3 = None
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +29,8 @@ class SpeechPlayer:
 
     def _find_cable_input_device(self) -> int | None:
         """Finds the index of 'CABLE Input' device for playback."""
+        if sd is None:
+            return None
         try:
             devices = sd.query_devices()
             for idx, dev in enumerate(devices):
@@ -28,6 +41,9 @@ class SpeechPlayer:
         return None
 
     def _init_tts_engine(self):
+        if pyttsx3 is None:
+            self.engine = None
+            return
         try:
             self.engine = pyttsx3.init()
             voices = self.engine.getProperty('voices')
@@ -45,7 +61,7 @@ class SpeechPlayer:
         Synthesizes the English sentence and streams it directly to CABLE Input.
         Returns True if played successfully, False otherwise.
         """
-        if not text or not self.engine:
+        if not text or not self.engine or sd is None or sf is None:
             return False
 
         tmp_path = None

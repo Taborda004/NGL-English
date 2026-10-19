@@ -112,8 +112,8 @@ def ensure_dependencies(venv_python: Path) -> None:
     """Comprueba e instala las dependencias de requirements.txt y navegadores Playwright."""
     print("  Verificando dependencias del proyecto...")
     
-    # Comprobar si streamlit y playwright ya están instalados dentro del venv
-    check_code = "import streamlit, playwright, google.generativeai, sounddevice, pyttsx3"
+    # Comprobar si las librerías principales ya están instaladas dentro del venv
+    check_code = "import streamlit, playwright, google.generativeai, bs4, PIL"
     result = subprocess.run(
         [str(venv_python), "-c", check_code],
         capture_output=True,
