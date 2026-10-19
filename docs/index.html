@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NGL Admin">
+  <title>NGL Admin - Control de Licencias</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0ea5e9;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --success-bg: rgba(34, 197, 94, 0.15);
+      --warning-bg: rgba(245, 158, 11, 0.15);
+      --danger-bg: rgba(239, 68, 68, 0.15);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 16px 12px 40px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .badge-status {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    @media(min-width: 600px) {
+      .stats-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .stat-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .stat-pending { color: var(--warning); }
+    .stat-approved { color: var(--success); }
+    .stat-revoked { color: var(--danger); }
+    .stat-total { color: var(--primary); }
+
+    .search-box {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 18px;
+    }
+    .search-box:focus { border-color: var(--primary); }
+
+    .section-header {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .count-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: var(--warning-bg);
+      color: var(--warning);
+    }
+
+    .user-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .user-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .user-card.pending-card {
+      border-left: 4px solid var(--warning);
+    }
+    .user-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .user-name {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .user-email {
+      font-size: 13px;
+      color: var(--text-muted);
+      word-break: break-all;
+    }
+    .user-meta {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 3px;
+      font-family: monospace;
+    }
+    .user-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+    }
+    .btn-approve {
+      background: var(--success);
+      color: #fff;
+      flex: 1;
+    }
+    .btn-reject {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+    .btn-action {
+      background: var(--border);
+      color: var(--text);
+      font-size: 12px;
+      padding: 8px 12px;
+      min-height: 36px;
+    }
+    .btn-danger-text {
+      color: var(--danger);
+    }
+
+    select.status-select {
+      flex: 1;
+      min-width: 150px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      outline: none;
+      min-height: 40px;
+    }
+    select.status-pending { background: var(--warning-bg); color: var(--warning); border-color: var(--warning); }
+    select.status-approved { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+    select.status-revoked { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+
+    .empty-state {
+      background: var(--card);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 24px 16px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0284c7;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      display: none;
+      z-index: 1000;
+      white-space: nowrap;
+    }
+
+    /* Modal de Login */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 999;
+    }
+    .modal-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+    .modal-input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      margin: 16px 0;
+      text-align: center;
+      outline: none;
+    }
+    .modal-input:focus { border-color: var(--primary); }
+  </style>
+</head>
+<body>
+
+  <!-- Modal Clave Maestra -->
+  <div id="authModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <h2 style="font-size: 20px;">NGL Licencias Cloud</h2>
+      <p style="color: var(--text-muted); font-size: 13px; margin-top: 6px;">
+        Acceso exclusivo de Administrador (Taborda004)
+      </p>
+      <input type="password" id="keyInput" class="modal-input" placeholder="Clave Maestra de Administrador">
+      <button class="btn btn-approve" style="width: 100%;" onclick="submitAuth()">Iniciar Sesión</button>
+      <p id="authError" style="color: var(--danger); font-size: 12px; margin-top: 10px; display: none;">
+        Clave incorrecta.
+      </p>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <div>
+        <div class="logo-title">NGL Assistant Cloud</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Aprobación Autónoma desde Móvil</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button class="btn btn-action" onclick="fetchLiveUsers()">Actualizar</button>
+        <button class="btn btn-action" style="color: var(--text-muted);" onclick="logout()">Salir</button>
+      </div>
+    </header>
+
+    <!-- Métricas Rápidas -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Pendientes</div>
+        <div class="stat-value stat-pending" id="statPending">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Aprobados</div>
+        <div class="stat-value stat-approved" id="statApproved">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Revocados</div>
+        <div class="stat-value stat-revoked" id="statRevoked">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Total</div>
+        <div class="stat-value stat-total" id="statTotal">0</div>
+      </div>
+    </div>
+
+    <!-- Buscador -->
+    <input type="text" id="searchInput" class="search-box" placeholder="Buscar por nombre o correo..." oninput="filterList()">
+
+    <!-- Solicitudes Pendientes (1-Clic para Móvil) -->
+    <div class="section-header">
+      <span>Solicitudes Pendientes</span>
+      <span class="count-pill" id="pendingPill">0</span>
+    </div>
+    <div id="pendingContainer" class="user-list">
+      <div class="empty-state">No hay solicitudes pendientes en este momento.</div>
+    </div>
+
+    <!-- Gestión Completa de Usuarios con Selector Desplegable -->
+    <div class="section-header" style="margin-top: 16px;">
+      <span>Todos los Usuarios Registrados</span>
+    </div>
+    <div id="allContainer" class="user-list">
+      <div class="empty-state">Cargando base de datos en tiempo real...</div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const FIREBASE_ENDPOINT = "https://ngl-licencias-default-rtdb.firebaseio.com/auth.json";
+    const MASTER_HASH = "582512fa1e68430dcad5bd666ce3c16d94bfa83c1ca638e524e3fdcdb5678c04";
+    let cloudData = { users: {} };
+
+    async function sha256(str) {
+      const buffer = new TextEncoder().encode(str);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function checkSession() {
+      const token = localStorage.getItem("ngl_admin_token");
+      if (token === MASTER_HASH) {
+        document.getElementById("authModal").style.display = "none";
+        fetchLiveUsers();
+      } else {
+        document.getElementById("authModal").style.display = "flex";
+      }
+    }
+
+    async function submitAuth() {
+      const input = document.getElementById("keyInput").value.trim();
+      const hash = await sha256(input);
+      if (hash === MASTER_HASH) {
+        localStorage.setItem("ngl_admin_token", hash);
+        document.getElementById("authModal").style.display = "none";
+        fetchLiveUsers();
+      } else {
+        document.getElementById("authError").style.display = "block";
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("ngl_admin_token");
+      location.reload();
+    }
+
+    async function fetchLiveUsers() {
+      showToast("Conectando con Firebase...");
+      try {
+        const res = await fetch(FIREBASE_ENDPOINT);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        cloudData = data || { users: {} };
+        if (!cloudData.users) cloudData.users = {};
+        renderUI();
+        showToast("Actualizado.");
+      } catch (e) {
+        showToast("Error de conexión: " + e.message);
+      }
+    }
+
+    async function updateStatus(userKey, newStatus) {
+      if (!cloudData.users[userKey]) return;
+      const u = cloudData.users[userKey];
+      u.status = newStatus;
+      if (newStatus === "approved") {
+        u.approved_at = new Date().toISOString();
+      } else if (newStatus === "revoked") {
+        u.revoked_at = new Date().toISOString();
+      }
+
+      await saveUser(userKey, u);
+      showToast("Estado cambiado a: " + newStatus.toUpperCase());
+      renderUI();
+    }
+
+    async function resetHWID(userKey) {
+      if (!confirm("¿Desvincular equipo? El usuario podrá entrar en una PC nueva.")) return;
+      const u = cloudData.users[userKey];
+      u.hwid = "";
+      u.reset_at = new Date().toISOString();
+      await saveUser(userKey, u);
+      showToast("HWID reseteado.");
+      renderUI();
+    }
+
+    async function deleteUser(userKey) {
+      if (!confirm("¿Eliminar permanentemente a este usuario?")) return;
+      delete cloudData.users[userKey];
+      try {
+        const url = `https://ngl-licencias-default-rtdb.firebaseio.com/auth/users/${userKey}.json`;
+        await fetch(url, { method: "DELETE" });
+        showToast("Usuario eliminado.");
+        renderUI();
+      } catch (err) {
+        showToast("Error al eliminar: " + err.message);
+      }
+    }
+
+    async function saveUser(userKey, userObj) {
+      try {
+        const url = `https://ngl-licencias-default-rtdb.firebaseio.com/auth/users/${userKey}.json`;
+        await fetch(url, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userObj)
+        });
+      } catch (e) {
+        showToast("Error al guardar: " + e.message);
+      }
+    }
+
+    function renderUI() {
+      const users = Object.entries(cloudData.users || {}).map(([k, u]) => ({ ...u, _key: k }));
+      users.sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
+
+      const total = users.length;
+      const pending = users.filter(u => u.status === "pending");
+      const approved = users.filter(u => u.status === "approved");
+      const revoked = users.filter(u => u.status === "revoked" || u.status === "banned");
+
+      document.getElementById("statTotal").textContent = total;
+      document.getElementById("statPending").textContent = pending.length;
+      document.getElementById("statApproved").textContent = approved.length;
+      document.getElementById("statRevoked").textContent = revoked.length;
+      document.getElementById("pendingPill").textContent = pending.length;
+
+      // Solicitudes Pendientes
+      const pendBox = document.getElementById("pendingContainer");
+      if (pending.length === 0) {
+        pendBox.innerHTML = `<div class="empty-state">No hay solicitudes pendientes. Todas están al día.</div>`;
+      } else {
+        pendBox.innerHTML = pending.map(u => `
+          <div class="user-card pending-card">
+            <div class="user-header">
+              <div>
+                <div class="user-name">${escapeText(u.name || "Sin nombre")}</div>
+                <div class="user-email">${escapeText(u.email || "")}</div>
+                <div class="user-meta">HWID: ${escapeText(u.hwid || "N/A")} | Nota: ${escapeText(u.note || "Sin nota")}</div>
+              </div>
+            </div>
+            <div class="user-actions">
+              <button class="btn btn-approve" onclick="updateStatus('${u._key}', 'approved')">Aprobar Acceso (1-Clic)</button>
+              <button class="btn btn-reject" onclick="updateStatus('${u._key}', 'revoked')">Rechazar</button>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      renderFilteredList(users);
+    }
+
+    function renderFilteredList(users) {
+      const q = (document.getElementById("searchInput").value || "").toLowerCase().trim();
+      const filtered = users.filter(u => 
+        (u.name || "").toLowerCase().includes(q) || 
+        (u.email || "").toLowerCase().includes(q)
+      );
+
+      const allBox = document.getElementById("allContainer");
+      if (filtered.length === 0) {
+        allBox.innerHTML = `<div class="empty-state">No se encontraron usuarios.</div>`;
+        return;
+      }
+
+      allBox.innerHTML = filtered.map(u => {
+        const st = u.status || "pending";
+        return `
+          <div class="user-card">
+            <div class="user-header">
+              <div>
+                <div class="user-name">${escapeText(u.name || "Sin nombre")}</div>
+                <div class="user-email">${escapeText(u.email || "")}</div>
+                <div class="user-meta">HWID: ${escapeText(u.hwid || "Sin vincular")} | Plataforma: ${escapeText(u.platform || "N/A")}</div>
+              </div>
+            </div>
+            <div class="user-actions">
+              <select class="status-select status-${st}" onchange="updateStatus('${u._key}', this.value)">
+                <option value="pending" ${st === "pending" ? "selected" : ""}>Pendiente</option>
+                <option value="approved" ${st === "approved" ? "selected" : ""}>Aprobado (Activo)</option>
+                <option value="revoked" ${st === "revoked" ? "selected" : ""}>Revocado (Suspendido)</option>
+              </select>
+              <button class="btn btn-action" onclick="resetHWID('${u._key}')">Reset PC</button>
+              <button class="btn btn-action btn-danger-text" onclick="deleteUser('${u._key}')">Eliminar</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function filterList() {
+      const users = Object.entries(cloudData.users || {}).map(([k, u]) => ({ ...u, _key: k }));
+      renderFilteredList(users);
+    }
+
+    function showToast(txt) {
+      const t = document.getElementById("toast");
+      t.textContent = txt;
+      t.style.display = "block";
+      setTimeout(() => { t.style.display = "none"; }, 2500);
+    }
+
+    function escapeText(s) {
+      const d = document.createElement("div");
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    checkSession();
+  </script>
+</body>
+</html>

@@ -32,6 +32,8 @@ scratch/
 *.wav
 *.html
 !admin.html
+!index.html
+!docs/**
 *.log
 .tempmediaStorage/
 
