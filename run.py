@@ -190,6 +190,22 @@ def ensure_env_configuration() -> None:
         print_success("Clave GEMINI_API_KEY detectada en .env.")
 
 
+def ensure_license_authorization() -> None:
+    """
+    Verifica la autorización de uso en la nube mediante LicenseManager.
+    Si la clave no está presente o no está autorizada, la solicita al usuario.
+    Si se rechaza, aborta la ejecución para impedir el uso sin consentimiento del autor.
+    """
+    from auth.license_manager import LicenseManager
+
+    is_valid, msg = LicenseManager.ensure_cli_license(ENV_FILE)
+    if not is_valid:
+        print_error(f"Acceso denegado: {msg}")
+        print_info("Para activar este programa, comunícate con el autor (Taborda004).")
+        sys.exit(1)
+    print_success(msg)
+
+
 def is_chrome_debugging_active(port: int = CHROME_DEBUG_PORT) -> bool:
     """Verifica si Chrome ya está escuchando activamente en el puerto de depuración."""
     try:
@@ -505,12 +521,16 @@ def main() -> None:
     print_step(3, "Comprobando Configuración (.env)")
     ensure_env_configuration()
 
-    # 5. Estado del Navegador Chromium (Chrome, Brave, Opera, Edge, etc.)
-    print_step(4, "Comprobando Conexión con Navegador Chromium (Brave, Opera, Chrome, Edge)")
+    # 5. Validación de Licencia y Autorización Remota
+    print_step(4, "Validando Licencia y Autorización de Uso")
+    ensure_license_authorization()
+
+    # 6. Estado del Navegador Chromium (Chrome, Brave, Opera, Edge, etc.)
+    print_step(5, "Comprobando Conexión con Navegador Chromium (Brave, Opera, Chrome, Edge)")
     ensure_chrome_running(preferred=preferred_browser)
 
-    # 6. Ejecución de Streamlit
-    print_step(5, "Iniciando Interfaz de Usuario")
+    # 7. Ejecución de Streamlit
+    print_step(6, "Iniciando Interfaz de Usuario")
     launch_streamlit(venv_python)
 
 

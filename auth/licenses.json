@@ -1,0 +1,11 @@
+{
+  "system_active": true,
+  "broadcast_message": "Servicio de NGL English Assistant operativo.",
+  "authorized_keys": [
+    "OWNER-TABORDA004-MASTER",
+    "NGL-LICENSE-PRO-2026"
+  ],
+  "authorized_hwids": [],
+  "banned_hwids": [],
+  "banned_keys": []
+}

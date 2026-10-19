@@ -114,6 +114,14 @@ CHROME_DEBUGGING_PORT=9222
 
 > **Aviso de Seguridad:** Tu archivo `.env` nunca debe subirse al repositorio. Ya está incluido en `.gitignore`.
 
+### 5. Control de Acceso y Licenciamiento Remoto
+Este software es privado y cuenta con protección de autorización remota vinculada a la nube. Si el software se ejecuta sin consentimiento previo del autor (**Taborda004**), el acceso se bloqueará impidiendo la ejecución de las funciones de automatización.
+* Para habilitar el acceso en un equipo nuevo, el usuario debe proporcionar su **Identificador de Equipo (HWID)** o una **Clave de Licencia** autorizada por el propietario.
+* La clave se configura en el archivo `.env`:
+  ```env
+  LICENSE_KEY=tu_clave_autorizada_aqui
+  ```
+
 ---
 
 ## Compatibilidad de Navegadores (Brave, Opera, Edge, Chrome)

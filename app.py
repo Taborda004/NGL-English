@@ -12,10 +12,27 @@ from analyzer.exercise_detector import ExerciseDetector, ExerciseType
 from ai.solver import AISolver
 from interaction.form_filler import FormFiller
 from history.history_manager import HistoryManager
+from pathlib import Path
 from automation.chain_runner import ChainRunner
 from config.settings import settings
+from auth.license_manager import LicenseManager
 
 st.set_page_config(page_title="NGL English Assistant", layout="wide")
+
+# Verificación de Licencia y Autorización Remota en la Nube
+auth_valid, auth_msg, auth_details = LicenseManager.verify(
+    license_key=settings.LICENSE_KEY,
+    endpoint_url=settings.AUTH_ENDPOINT_URL,
+    local_fallback_file=Path(__file__).resolve().parent / "auth" / "licenses.json"
+)
+
+if not auth_valid:
+    st.title("NGL ENGLISH ASSISTANT")
+    st.error(f"[ACCESO DENEGADO] {auth_msg}")
+    st.warning("Este software es privado y está protegido. Se requiere autorización explícita del autor para ejecutarlo.")
+    hwid = LicenseManager.get_machine_hwid()
+    st.info(f"**Identificador de tu equipo (HWID):** `{hwid}`\n\nEnvía este identificador al autor (Taborda004) para habilitar tu acceso.")
+    st.stop()
 
 # Prevent Google Chrome Auto-Translate from breaking React DOM reconciliation
 st.html("""
@@ -63,6 +80,7 @@ if info:
     if not settings.GEMINI_API_KEY:
         st.sidebar.error("[AVISO] GEMINI_API_KEY no configurada en .env")
         st.warning("[AVISO] **Clave de API de Gemini no detectada.** Recuerda configurar tu `GEMINI_API_KEY` en el archivo `.env` para que la IA pueda resolver los ejercicios.")
+    st.sidebar.caption(f"Licencia: {auth_details.get('role', 'Activa')} ({auth_details.get('hwid', '')})")
     st.sidebar.markdown("---")
 
     # Initialize session state for execution
