@@ -178,7 +178,7 @@ class LicenseManager:
         enlace exclusivo de hardware 1:1, validación de integridad y firmas digitales.
         """
         hwid = cls.get_machine_hwid()
-        key = (license_key or os.getenv("LICENSE_KEY", "")).strip()
+        key = (license_key if license_key is not None else os.getenv("LICENSE_KEY", "")).strip()
         url = (endpoint_url or os.getenv("AUTH_ENDPOINT_URL", DEFAULT_ENDPOINT)).strip()
 
         # 1. Validación de clave maestra del autor

@@ -219,11 +219,22 @@ class CloudAuthManager:
 
     @classmethod
     def get_cached_session(cls) -> Optional[Dict[str, str]]:
-        """Recupera la sesión activa guardada localmente."""
+        """
+        Recupera y valida la sesión activa guardada localmente.
+        Si detecta que el archivo fue copiado o transferido desde otra máquina,
+        invalida y purga la caché de inmediato (protección anti-clonación).
+        """
         if SESSION_CACHE_FILE.exists():
             try:
                 with open(SESSION_CACHE_FILE, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    data = json.load(f)
+                if isinstance(data, dict):
+                    cached_hwid = (data.get("hwid") or "").strip().upper()
+                    current_hwid = LicenseManager.get_machine_hwid().strip().upper()
+                    if cached_hwid and cached_hwid != current_hwid:
+                        cls.clear_session()
+                        return None
+                    return data
             except Exception:
                 pass
         return None
