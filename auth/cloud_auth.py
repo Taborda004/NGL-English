@@ -264,6 +264,31 @@ class CloudAuthManager:
         return users
 
     @classmethod
+    def admin_set_status(cls, email: str, status: str) -> Tuple[bool, str]:
+        """Actualiza directamente el estado de un usuario (approved, pending, revoked)."""
+        clean_email = email.strip().lower()
+        clean_status = status.strip().lower()
+        data = cls.load_registry()
+        users = data.get("users", {})
+
+        user_key = cls._email_to_key(clean_email)
+        target_key = user_key if user_key in users else (clean_email if clean_email in users else None)
+        if not target_key:
+            return False, "Usuario no encontrado."
+
+        user = users[target_key]
+        user["status"] = clean_status
+        if clean_status == "approved":
+            user["approved_at"] = datetime.now(timezone.utc).isoformat()
+        elif clean_status == "revoked":
+            user["revoked_at"] = datetime.now(timezone.utc).isoformat()
+
+        saved = cls.save_registry(data)
+        if saved:
+            return True, f"Estado actualizado a '{clean_status}' para '{user.get('name')}'."
+        return False, "Error al guardar los cambios."
+
+    @classmethod
     def admin_approve_user(cls, email: str) -> Tuple[bool, str]:
         """Aprueba una solicitud de acceso y fija su estado como activo."""
         clean_email = email.strip().lower()

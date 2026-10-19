@@ -119,9 +119,14 @@ if info:
         st.sidebar.markdown("---")
         st.sidebar.subheader("Administración")
         open_admin = st.sidebar.checkbox(
-            "Abrir Panel de Control (Aprobar Usuarios en 1-Clic)",
+            "Abrir Panel de Control (Aprobar Usuarios)",
             value=st.session_state.get("admin_panel_open", False)
         )
+        if st.sidebar.button("Abrir Portal Web en Navegador"):
+            import webbrowser
+            admin_path = Path(__file__).resolve().parent / "admin.html"
+            webbrowser.open(admin_path.as_uri())
+
         if open_admin:
             render_admin_dashboard()
             st.stop()

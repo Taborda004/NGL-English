@@ -9,6 +9,8 @@ from auth.license_manager import LicenseManager
 def mock_cloud_store(tmp_path, monkeypatch):
     store_file = tmp_path / "cloud_users.json"
     monkeypatch.setattr(CloudAuthManager, "get_users_store_path", classmethod(lambda cls: store_file))
+    monkeypatch.setattr("auth.cloud_auth.DEFAULT_CLOUD_ENDPOINT", "")
+    monkeypatch.setenv("AUTH_CLOUD_ENDPOINT", "")
     return store_file
 
 
@@ -87,3 +89,22 @@ def test_admin_reset_hwid(mock_cloud_store, monkeypatch):
     auth_ok, msg, data = CloudAuthManager.authenticate_user("carlos@test.com")
     assert auth_ok is True
     assert data["hwid"] == "NGL-NEW-LAPTOP-5555"
+
+
+def test_admin_set_status(mock_cloud_store):
+    CloudAuthManager.request_access("Carlos Gomez", "carlos@test.com")
+    # Change status to approved via selector/setter
+    ok, msg = CloudAuthManager.admin_set_status("carlos@test.com", "approved")
+    assert ok is True
+    assert "approved" in msg
+
+    auth_ok, _, data = CloudAuthManager.authenticate_user("carlos@test.com")
+    assert auth_ok is True
+    assert data["status"] == "approved"
+
+    # Change status to revoked via selector/setter
+    ok2, msg2 = CloudAuthManager.admin_set_status("carlos@test.com", "revoked")
+    assert ok2 is True
+    auth_ok2, _, _ = CloudAuthManager.authenticate_user("carlos@test.com")
+    assert auth_ok2 is False
+

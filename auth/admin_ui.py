@@ -160,10 +160,30 @@ def render_admin_dashboard() -> None:
             approved_at = (u.get("approved_at") or "")[:19].replace("T", " ")
             last_login = (u.get("last_login") or "Nunca")[:19].replace("T", " ")
 
-            with st.expander(f"{name} ({email}) - Activo"):
+            with st.expander(f"{name} ({email}) - {u.get('status', 'approved').upper()}"):
                 st.write(f"**Hardware Vinculado:** `{hwid}`")
                 st.write(f"**Aprobado el:** {approved_at} | **Ultimo acceso:** {last_login}")
                 
+                curr_status = u.get("status", "approved")
+                status_choices = ["approved", "pending", "revoked"]
+                status_names = {"approved": "Aprobado (Activo)", "pending": "Pendiente", "revoked": "Revocado (Suspendido)"}
+                
+                c_sel, _ = st.columns([2, 3])
+                with c_sel:
+                    new_sel = st.selectbox(
+                        "Seleccionar Estado:",
+                        options=[status_names[s] for s in status_choices],
+                        index=status_choices.index(curr_status) if curr_status in status_choices else 0,
+                        key=f"sel_status_{email}_{idx}"
+                    )
+                    chosen_status = [k for k, v in status_names.items() if v == new_sel][0]
+                    if chosen_status != curr_status:
+                        ok, msg = CloudAuthManager.admin_set_status(email, chosen_status)
+                        if ok:
+                            st.success(msg)
+                            st.rerun()
+
+                st.markdown("---")
                 col_a, col_b, col_c = st.columns([1.5, 2, 1.5])
                 if col_a.button("Revocar Acceso", key=f"btn_rev_{email}_{idx}", type="secondary"):
                     ok, msg = CloudAuthManager.admin_revoke_user(email)
